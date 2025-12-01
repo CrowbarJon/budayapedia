@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "608163842222",
+    "firebase_url": "https://budayapedia-156b3-default-rtdb.firebaseio.com",
+    "project_id": "budayapedia-156b3",
+    "storage_bucket": "budayapedia-156b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608163842222:android:21eaa7f1d5fc85829b053f",
+        "android_client_info": {
+          "package_name": "com.example.budayapedia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ2zkfJDmyXgvGrJSCL8Npjj1vZ8snz6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
