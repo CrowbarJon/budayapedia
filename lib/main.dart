@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Wajib untuk StreamBuilder
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+// Pastikan import ini sudah benar dan file ada
 import 'package:budayapedia/pages/home.dart'; // Import Halaman Dashboard
 import 'package:budayapedia/pages/login.dart'; // Import Halaman Login
-import 'package:budayapedia/pages/welcome.dart'; // WelcomePage tidak lagi digunakan di sini
+import 'package:budayapedia/pages/welcome.dart';
 
 void main() async {
   // 1. Wajib ada: Memastikan binding sudah diinisialisasi sebelum memanggil native code.
@@ -45,16 +46,16 @@ class MyApp extends StatelessWidget {
             );
           }
 
-          // Jika ada data user (berarti user SUDAH LOGIN):
-          // Langsung arahkan ke HomePage (Dashboard)
+          // KASUS 1: Jika ada data user (berarti user SUDAH LOGIN):
+          // Arahkan ke Halaman Utama (Dashboard)
           if (snapshot.hasData && snapshot.data != null) {
-            return const WelcomePage();
+            // *** PERBAIKAN UTAMA: Mengganti WelcomePage() menjadi HomePage() ***
+            return const HomePage(); 
           }
 
-          // Jika tidak ada data user (belum login/sudah logout):
-          // Arahkan ke LoginPage
-          // Kita asumsikan WelcomePage adalah halaman login pertama
-          return const LoginPage();
+          // KASUS 2: Jika tidak ada data user (belum login/sudah logout):
+          // Arahkan ke Halaman Login
+          return const LoginPage(); 
         },
       ),
       // ^^^ LOGIKA UTAMA NAVIGASI APLIKASI ^^^
