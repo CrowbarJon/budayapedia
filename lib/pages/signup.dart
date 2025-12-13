@@ -42,7 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // Pengecekan dasar panjang password (Firebase meminta minimal 6 karakter)
     if (passwordController.text.length < 6) {
-       setState(() {
+      setState(() {
         _errorMessage = "Password minimal 6 karakter.";
       });
       return;
@@ -56,17 +56,35 @@ class _SignUpPageState extends State<SignUpPage> {
 
     try {
       // 1. Panggil metode pendaftaran Firebase
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // 2. Navigasi ke halaman utama setelah pendaftaran berhasil
-      if (mounted) {
-        // Menggunakan pushReplacement untuk mencegah user kembali ke halaman Sign Up
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const WelcomePage()),
-        );
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // 2. >>> MODIFIKASI: KIRIM EMAIL VERIFIKASI <<<
+        await user.sendEmailVerification();
+        
+        // 3. Navigasi dan Pemberitahuan setelah pendaftaran dan pengiriman email
+        if (mounted) {
+          // Tampilkan pesan sukses dalam SnackBar
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Pendaftaran berhasil! Email verifikasi telah dikirim ke alamat email Anda. Mohon cek inbox/spam.',
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: primaryColor,
+              duration: Duration(seconds: 6),
+            ),
+          );
+
+          // Navigasi kembali ke halaman Login
+          // Karena pengguna harus login setelah memverifikasi email mereka
+          Navigator.of(context).pop(); 
+        }
       }
     } on FirebaseAuthException catch (e) {
       // 3. Tangani error dari Firebase

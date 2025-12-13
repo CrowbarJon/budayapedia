@@ -6,7 +6,6 @@ import 'courseview.dart';
 // Import file Anda yang sebelumnya (Menggunakan nama file yang Anda konfirmasi):
 import 'setting_panel.dart'; 
 import 'notifikasi.dart';
-import 'welcome.dart'; 
 
 // Definisikan warna yang digunakan dalam desain Anda
 const Color primaryColor = Color(0xFF2C3E50);

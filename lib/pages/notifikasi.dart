@@ -154,7 +154,7 @@ class _NotificationPageState extends State<NotificationPage> {
             color: notification['color'],
             isUnread: isUnread,
           );
-        }).toList(),
+        }),
         const Divider(height: 1),
       ],
     );

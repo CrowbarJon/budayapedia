@@ -1,7 +1,7 @@
+// lib/mycourse.dart
 import 'package:flutter/material.dart';
-import 'courseview.dart'; // Import CourseDetailsView untuk navigasi
+import 'courseview.dart'; // Import CourseDetailsView
 
-// Definisikan warna yang sama agar konsisten
 const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
@@ -14,10 +14,10 @@ class Course {
   final String title;
   final String category;
   final String description;
-  final List<String> contents; // List untuk menyimpan poin-poin isi kursus
+  final List<String> contents; 
   final String videoCount;
   final String duration;
-  final String imageUrl; // Path gambar lokal
+  final String imageUrl; 
 
   Course({
     required this.title,
@@ -31,18 +31,17 @@ class Course {
 }
 
 // =======================================================
-// B. DATA KURSUS LENGKAP (Termasuk Filosofi Adat Minangkabau)
+// B. DATA KURSUS
 // =======================================================
 
 final List<Course> allCourses = [
-  // 1. FILOSOFI ADAT MINANGKABAU (Data Lengkap)
   Course(
     title: "Filosofi Adat dan Rumah Gadang Minangkabau",
     category: "Adat",
     description: "Pelajari sistem matrilineal, nilai-nilai luhur adat, dan arsitektur ikonik Rumah Gadang Sumatra Barat.",
     videoCount: '18 videos',
     duration: "2h 20m",
-    imageUrl: 'assets/sumatra.jpg', // Ganti dengan path gambar Anda
+    imageUrl: 'assets/sumatra.jpg', 
     contents: [
       "Memahami struktur sosial matrilineal Suku Minangkabau.",
       "Menjelaskan peran penting Bundo Kanduang dan Niniak Mamak dalam adat.",
@@ -50,14 +49,13 @@ final List<Course> allCourses = [
       "Studi kasus upacara adat pernikahan Minangkabau.",
     ],
   ),
-  // 2. TARI KLASIK KERATON JAWA
   Course(
     title: "Gerak Anggun Tari Klasik Keraton Jawa",
     category: "Seni",
     description: "Pengenalan mendalam pada Tari Serimpi dan Bedhaya, termasuk filosofi di balik gerakan lembut dan busana penari Keraton.",
     videoCount: '12 videos',
     duration: "1h 15m",
-    imageUrl: 'assets/tarikawa.jpg', // Ganti dengan path gambar Anda
+    imageUrl: 'assets/tarikawa.jpg',
     contents: [
       "Teknik dasar gerakan lambat dan halus Tari Serimpi.",
       "Memahami filosofi ketenangan dan kesabaran dalam Tari Bedhaya.",
@@ -65,14 +63,13 @@ final List<Course> allCourses = [
       "Menganalisis makna simbolis busana penari Keraton.",
     ],
   ),
-  // 3. MANIK-MANIK SUKU DAYAK
   Course(
     title: "Manik-Manik dan Busana Adat Suku Dayak",
     category: "Kerajinan",
     description: "Eksplorasi Pakaian Adat Dayak Kalimantan, fokus pada teknik pembuatan manik-manik, ukiran, dan busana King Baba/King Bibinge.",
     videoCount: '8 videos',
     duration: "2h 15m",
-    imageUrl: 'assets/dayak.jpg', // Ganti dengan path gambar Anda
+    imageUrl: 'assets/dayak.jpg',
     contents: [
       "Pengenalan berbagai jenis manik-manik dan bahan dasar.",
       "Langkah-langkah pembuatan aksesoris manik-manik Dayak.",
@@ -80,14 +77,13 @@ final List<Course> allCourses = [
       "Sejarah dan fungsi busana King Baba dan King Bibinge.",
     ],
   ),
-  // 4. PAPEDA DAN KUAH KUNING PAPUA
   Course(
     title: "Memasak Papeda dan Kuah Kuning Ikan Tongkol",
     category: "Makanan",
     description: "Teknik dan resep spesifik untuk hidangan ikonik Papua. Belajar membuat Papeda dari sagu dan mengolahnya bersama Kuah Kuning Ikan Tongkol.",
     videoCount: '8 videos',
     duration: "2h 15m",
-    imageUrl: 'assets/papeda.jpg', // Ganti dengan path gambar Anda
+    imageUrl: 'assets/papeda.jpg',
     contents: [
       "Cara mengolah sagu menjadi Papeda yang kenyal sempurna.",
       "Resep bumbu lengkap untuk Kuah Kuning Ikan Tongkol.",
@@ -158,7 +154,7 @@ class _MyCoursePageState extends State<MyCoursePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CourseDetailsView(course: course), // Meneruskan objek course
+            builder: (context) => CourseDetailsView(course: course), 
           ), 
         );
       },

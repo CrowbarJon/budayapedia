@@ -37,7 +37,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
       trailing: Switch(
         value: value,
         onChanged: onChanged, // Menerima fungsi onChanged dari luar
-        activeColor: primaryColor,
+        activeThumbColor: primaryColor,
         inactiveTrackColor: Colors.grey[300],
       ),
     );

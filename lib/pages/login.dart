@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-//import 'package:budayapedia/pages/welcome.dart';
+// import 'package:budayapedia/pages/welcome.dart'; // Jika tidak dipakai, boleh dihapus
 import 'package:budayapedia/pages/home.dart';
 import 'package:budayapedia/pages/signup.dart';
+import 'package:budayapedia/pages/lupa_password.dart'; // <<< IMPORT BARU DITAMBAHKAN
 
 // Konstanta Warna
 const Color primaryColor = Color(0xFF2C3E50); // Biru gelap untuk tombol utama
@@ -21,7 +22,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // Instances
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  // Gunakan const untuk menghindari error constructor
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Controllers
@@ -36,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
 
   // Helper untuk menampilkan pesan error
   void _showSnackBar(String message) {
-    // Pastikan context valid saat menggunakan ScaffoldMessenger
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
@@ -69,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // --- FUNGSI OTENTIKASI (Email/Password) ---
-  // Hapus fungsi simulasi lama, ini adalah fungsi otentikasi yang benar
   Future<void> _handleSignIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       _showSnackBar('Email dan Password tidak boleh kosong.');
@@ -81,17 +79,36 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      // 1. Panggil metode login Firebase
       await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Navigasi ke WelcomePage (asumsi StreamBuilder di main.dart akan menangani ini)
-      // Gunakan pushReplacement agar pengguna tidak bisa kembali ke halaman login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      // Dapatkan user yang baru login
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        // 2. LOGIKA BARU: CEK VERIFIKASI EMAIL
+        
+        // Memuat ulang data pengguna untuk mendapatkan status verifikasi terbaru
+        await user.reload(); 
+        user = _auth.currentUser; // Update objek user setelah reload
+        
+        if (user!.emailVerified) {
+          // Email terverifikasi: Lanjutkan ke Home Page
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
+        } else {
+          // Email belum diverifikasi: Tampilkan pesan dan logout pengguna
+          await _auth.signOut(); // Logout pengguna yang belum terverifikasi
+          _showSnackBar('Login Gagal. Email Anda belum diverifikasi. Mohon cek inbox Anda.');
+        }
+      }
 
     } on FirebaseAuthException catch (e) {
       String message;
@@ -99,6 +116,8 @@ class _LoginPageState extends State<LoginPage> {
         message = 'Tidak ada pengguna yang ditemukan dengan email ini.';
       } else if (e.code == 'wrong-password') {
         message = 'Password salah.';
+      } else if (e.code == 'invalid-credential') {
+        message = 'Email atau password tidak valid.';
       } else {
         message = 'Login Gagal: ${e.message}';
       }
@@ -109,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint('Error Login: $e');
     }
 
-    // Nonaktifkan Loading hanya jika navigasi gagal (jika berhasil, halaman sudah diganti)
+    // Nonaktifkan Loading hanya jika navigasi ke HomePage tidak terjadi
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -158,7 +177,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (sisa kode build Anda)
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -258,7 +276,13 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // >>> LOGIKA BARU: NAVIGASI KE LUPA PASSWORD PAGE <<<
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LupaPasswordPage()),
+                      );
+                    },
                     child: const Text('Forgot password?', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600, fontFamily: 'DMSans')),
                   ),
                 ],
@@ -270,7 +294,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSignIn, // Menggunakan _handleSignIn yang asli
+                  onPressed: _isLoading ? null : _handleSignIn,
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
@@ -283,20 +307,20 @@ class _LoginPageState extends State<LoginPage> {
 
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      strokeWidth: 3,
-                    ),
-                  )
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 3,
+                        ),
+                      )
                       : const Text(
-                      'Sign In',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'DMSans')
-                  ),
+                          'Sign In',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'DMSans')
+                      ),
                 ),
               ),
 
@@ -340,7 +364,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 height: 50,
                 child: OutlinedButton(
-                  onPressed: _signInWithGoogle, // Menggunakan _signInWithGoogle
+                  onPressed: _signInWithGoogle,
 
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(

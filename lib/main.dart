@@ -5,7 +5,6 @@ import 'firebase_options.dart';
 // Pastikan import ini sudah benar dan file ada
 import 'package:budayapedia/pages/home.dart'; // Import Halaman Dashboard
 import 'package:budayapedia/pages/login.dart'; // Import Halaman Login
-import 'package:budayapedia/pages/welcome.dart';
 
 void main() async {
   // 1. Wajib ada: Memastikan binding sudah diinisialisasi sebelum memanggil native code.
