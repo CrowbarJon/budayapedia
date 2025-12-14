@@ -3,19 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart'; 
 // Import file navigasi
 import 'login.dart'; 
-import '../securityPage.dart';
-import '../learning_history_page.dart'; 
-//import '../badge_collection_page.dart'; 
-//import '../favorites_page.dart'; 
-import '../setting_pages.dart'; 
-import '../infoHub.dart'; // Import InfoHubPage yang baru
+import '/securityPage.dart';
+import '/learning_history_page.dart'; 
+import '/setting_pages.dart'; 
+import '/infoHub.dart'; 
 
 // Definisikan warna yang digunakan dalam desain Anda (Konsistensi)
-const Color primaryColor = Color(0xFF2C3E50); 
+const Color primaryColor = Color(0xFF2C3E50); // Biru Tua (Aksen utama)
 const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
-const Color accentColor = Color(0xFFFFCC33); // Kuning (Level Progress)
-const Color successColor = Color(0xFF27AE60); 
+const Color accentColor = Color(0xFFFFA000); // Oranye (Aksen tombol/edit)
+const Color borderColor = Color(0xFFE0E0E0); // Warna Border
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -28,18 +26,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final User? user = FirebaseAuth.instance.currentUser;
   late String currentUsername;
   final ImagePicker _picker = ImagePicker(); 
-
-  // --- DATA SIMULASI METRIK & LEVEL ---
-  final int userStreak = 30;
-  final int currentLevel = 10;
-  final double progressPercentage = 0.75; 
-  final List<Map<String, dynamic>> recentBadges = [
-    {'name': 'Jelajah Jawa', 'icon': Icons.location_city, 'color': Colors.orange},
-    {'name': 'Maestro Tari', 'icon': Icons.accessibility_new, 'color': Colors.blue},
-    {'name': '50 Kuis', 'icon': Icons.quiz, 'color': successColor},
-    {'name': 'Pelestari', 'icon': Icons.volunteer_activism, 'color': Colors.purple},
-  ];
-  // ------------------------------------
 
   @override
   void initState() {
@@ -150,197 +136,102 @@ class _ProfilePageState extends State<ProfilePage> {
   // --- END UTILITY FUNGSI ---
   
   
-  // WIDGET KARTU LEVEL/PROGRESS
-  Widget _buildLevelProgressCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const LearningHistoryPage()));
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [primaryColor.withOpacity(0.9), primaryColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Tingkat Kemahiran Anda', style: TextStyle(color: Colors.white70, fontSize: 12)),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Level $currentLevel: Pewaris Budaya', 
-                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                const Icon(Icons.shield_moon_outlined, color: Colors.white, size: 28),
-              ],
-            ),
-            const SizedBox(height: 10),
+  // WIDGET KARTU MENU INTERAKTIF YANG LEBIH CLEAN
+  Widget _buildInteractiveCard({
+    required BuildContext context, 
+    required IconData icon, 
+    required String title, 
+    required VoidCallback onTap, 
+    bool isLogout = false
+  }) {
+    // Warna untuk Ikon & Teks
+    final Color iconColor = isLogout ? Colors.red.shade700 : primaryColor;
+    final Color textColor = isLogout ? Colors.red.shade700 : darkTextColor;
 
-            // Progress Bar Visual
-            LinearProgressIndicator(
-              value: progressPercentage,
-              backgroundColor: Colors.white38,
-              valueColor: AlwaysStoppedAnimation<Color>(accentColor), 
-            ),
-            const SizedBox(height: 5),
-            Text('${(progressPercentage * 100).toInt()}% menuju Level ${currentLevel + 1}', 
-                 style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // WIDGET KARTU STREAK BARU (LEBAR PENUH - FOKUS UTAMA METRIK)
-  Widget _buildStreakFullWidthCard() {
-    return Container(
-      width: double.infinity, 
-      padding: const EdgeInsets.all(18),
-      margin: const EdgeInsets.only(bottom: 25.0),
-      decoration: BoxDecoration(
-        color: Colors.white, 
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-        border: Border.all(color: Colors.red.withOpacity(0.3), width: 1.5)
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.local_fire_department, color: Colors.red, size: 35),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                userStreak.toString(), 
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: darkTextColor)
-              ),
-              const Text(
-                'Hari Berturut-turut (Streak)', 
-                style: TextStyle(fontSize: 12, color: lightTextColor)
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  // WIDGET KARTU MENU INTERAKTIF
-  Widget _buildInteractiveCard(BuildContext context, IconData icon, String title, VoidCallback onTap, {bool isLogout = false}) {
-    return GestureDetector(
+    return InkWell( // Menggunakan InkWell untuk efek riak yang lebih baik (UI/UX)
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: lightTextColor.withOpacity(0.1), width: 1),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 0), // Padding horizontal 0 karena ada divider
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: borderColor, width: 1.0)),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isLogout ? Colors.red.withOpacity(0.1) : primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: isLogout ? Colors.red : primaryColor, size: 24),
-            ),
+            Icon(icon, color: iconColor, size: 24),
             const SizedBox(width: 15),
             Expanded(
               child: Text(
                 title, 
                 style: TextStyle(
                   fontSize: 16, 
-                  fontWeight: FontWeight.w600,
-                  color: isLogout ? Colors.red : darkTextColor
+                  fontWeight: FontWeight.w500,
+                  color: textColor
                 )
               ),
             ),
-            isLogout ? const SizedBox.shrink() : const Icon(Icons.chevron_right, color: lightTextColor),
+            isLogout 
+                ? const SizedBox.shrink() 
+                : Icon(Icons.chevron_right, color: lightTextColor.withOpacity(0.8)),
           ],
         ),
       ),
     );
   }
-  
-  // WIDGET PREVIEW LENCANA
-  Widget _buildBadgesPreview() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 25.0),
+
+
+  // WIDGET HEADER PROFIL (Pemusatan Informasi Akun)
+  Widget _buildProfileHeader(String email, String photoUrl) {
+    return Container(
+      padding: const EdgeInsets.only(top: 30, bottom: 40),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: borderColor, width: 1.5)),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Lencana Terbaru', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor)),
-          const SizedBox(height: 10),
-          
-          // TAMPILAN GRID LENCANA
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 4, 
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4, 
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 1.0, 
-            ),
-            itemBuilder: (context, index) {
-              final badge = recentBadges[index];
-              return Tooltip(
-                message: badge['name'] as String,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: badge['color'].withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10), 
-                    border: Border.all(color: badge['color'], width: 1.5),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      badge['icon'] as IconData,
-                      color: badge['color'] as Color,
-                      size: 28,
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 40, 
+                backgroundColor: primaryColor.withOpacity(0.1), 
+                backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) as ImageProvider : null, 
+                child: photoUrl.isEmpty ? const Icon(Icons.person, size: 40, color: primaryColor) : null
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: _showPhotoOptions, 
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
+                    child: const Icon(Icons.edit, size: 16, color: Colors.white),
                   ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
-          
           const SizedBox(height: 15),
-          GestureDetector(
-             onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const BadgeCollectionPage()),
-             ),
-             child: const Center(
-                child: Text('Lihat Semua Koleksi Lencana', style: TextStyle(color: primaryColor, fontSize: 13, fontWeight: FontWeight.w500)),
-             ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, 
+            children: [
+              Text(currentUsername, style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold, color: darkTextColor)),
+              GestureDetector(
+                onTap: _editUsername, 
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 8.0), 
+                  child: Icon(Icons.mode_edit_outline, size: 18, color: lightTextColor)
+                )
+              ),
+            ]
           ),
+          const SizedBox(height: 5),
+          Text(email, style: const TextStyle(fontSize: 14, color: lightTextColor)),
         ],
       ),
     );
@@ -353,86 +244,76 @@ class _ProfilePageState extends State<ProfilePage> {
     final String photoUrl = user?.photoURL ?? '';
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Akun Saya', style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor)),
         backgroundColor: Colors.white,
-        elevation: 1,
+        elevation: 0, // Hilangkan shadow AppBar untuk tampilan yang lebih bersih
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0), 
         child: Column(
           children: <Widget>[
             // --- 1. Header Profil ---
-            Container(
-              padding: const EdgeInsets.only(top: 30, bottom: 20),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  CircleAvatar(radius: 40, backgroundColor: primaryColor.withOpacity(0.1), backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) as ImageProvider : null, child: photoUrl.isEmpty ? const Icon(Icons.person, size: 40, color: primaryColor) : null),
-                  GestureDetector(onTap: _showPhotoOptions, child: const Padding(padding: EdgeInsets.only(top: 8.0), child: Text('Edit', style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.w600)))),
-                  const SizedBox(height: 15),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(currentUsername, style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold, color: darkTextColor)),
-                    GestureDetector(onTap: _editUsername, child: const Padding(padding: EdgeInsets.only(left: 4.0), child: Icon(Icons.edit, size: 20, color: lightTextColor))),
-                  ]),
-                  const SizedBox(height: 5),
-                  Text(email, style: const TextStyle(fontSize: 14, color: lightTextColor)),
-                ],
-              ),
-            ),
+            _buildProfileHeader(email, photoUrl),
             
-            // --- KARTU LEVEL/PROGRESS (UTAMA) ---
-            _buildLevelProgressCard(context),
-
-            // --- 2. METRIK PRESTASI (STREAK - LEBAR PENUH) ---
-            _buildStreakFullWidthCard(),
-            
-            // --- PREVIEW LENCANA ---
-            _buildBadgesPreview(),
-
-
-            // --- 3. KELOMPOK MENU: RIWAYAT & KONTEN ---
-            const Align(alignment: Alignment.centerLeft, child: Text('Aktivitas Belajar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor))),
-            const SizedBox(height: 10),
+            // --- 2. KELOMPOK MENU: AKTIVITAS & RIWAYAT ---
+            const SizedBox(height: 20),
+            const Align(alignment: Alignment.centerLeft, child: Text('Aktivitas & Riwayat', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor))),
+            const SizedBox(height: 5),
             
             // RIWAYAT PEMBELAJARAN
-            _buildInteractiveCard(context, Icons.history, 'Riwayat Pembelajaran', 
-              () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LearningHistoryPage())),
+            _buildInteractiveCard(
+              context: context, 
+              icon: Icons.history, 
+              title: 'Riwayat Pembelajaran', 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LearningHistoryPage())),
             ),
-            // MATERI FAVORIT
-            _buildInteractiveCard(context, Icons.bookmark_border, 'Materi Favorit Saya', 
-              () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FavoriteContentPage())),
-            ),
-
-            // --- 4. KELOMPOK MENU: PENGATURAN & KEAMANAN ---
+            
+            // --- 3. KELOMPOK MENU: PENGATURAN & KEAMANAN ---
             const SizedBox(height: 20),
             const Align(alignment: Alignment.centerLeft, child: Text('Pengaturan Akun', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor))),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             // KEAMANAN AKUN
-            _buildInteractiveCard(context, Icons.lock_outline, 'Keamanan Akun', 
-              () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityPage())),
+            _buildInteractiveCard(
+              context: context, 
+              icon: Icons.lock_outline, 
+              title: 'Keamanan Akun', 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityPage())),
             ),
             
             // PENGATURAN APLIKASI
-            _buildInteractiveCard(context, Icons.settings_outlined, 'Pengaturan Aplikasi', 
-               () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()))
+            _buildInteractiveCard(
+              context: context, 
+              icon: Icons.settings_outlined, 
+              title: 'Pengaturan Aplikasi', 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()))
             ),
             
-            // --- 5. PUSAT INFORMASI & DUKUNGAN (Tombol Tunggal) ---
+            // --- 4. PUSAT INFORMASI & DUKUNGAN (Tombol Tunggal) ---
             const SizedBox(height: 20),
-            const Align(alignment: Alignment.centerLeft, child: Text('Dukungan & Info', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor))),
-            const SizedBox(height: 10),
+            const Align(alignment: Alignment.centerLeft, child: Text('Dukungan & Informasi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightTextColor))),
+            const SizedBox(height: 5),
 
-            // PUSAT INFORMASI BUDAYAPEDIA (Menggantikan Bantuan, Privasi, dan Tentang)
-            _buildInteractiveCard(context, Icons.info_outline, 'Pusat Informasi BudayaPedia', 
-              () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InfoHubPage())),
+            // PUSAT INFORMASI BUDAYAPEDIA
+            _buildInteractiveCard(
+              context: context, 
+              icon: Icons.info_outline, 
+              title: 'Pusat Informasi BudayaPedia', 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InfoHubPage())),
             ),
 
 
-            // --- 6. KELOMPOK MENU: LOGOUT ---
+            // --- 5. KELOMPOK MENU: LOGOUT ---
             const SizedBox(height: 30),
-            _buildInteractiveCard(context, Icons.logout, 'Logout', _handleSignOut, isLogout: true),
+            _buildInteractiveCard(
+              context: context, 
+              icon: Icons.logout, 
+              title: 'Logout', 
+              onTap: _handleSignOut, 
+              isLogout: true
+            ),
              const SizedBox(height: 40),
           ],
         ),

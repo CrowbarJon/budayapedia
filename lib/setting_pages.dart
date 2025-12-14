@@ -43,8 +43,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SnackBar(content: Text("Cache berhasil dibersihkan!"))
               );
             },
-            child: const Text("Ya, Bersihkan"),
             style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+            child: const Text("Ya, Bersihkan"),
           ),
         ],
       ),
@@ -101,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: accentColor,
+        activeThumbColor: accentColor,
       ),
       onTap: () => onChanged(!value), // Membuat seluruh list dapat ditekan
     );

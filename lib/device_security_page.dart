@@ -189,7 +189,7 @@ class _DeviceSecurityPageState extends State<DeviceSecurityPage> {
             // Daftar Sesi Aktif (menggunakan data static yang persist)
             ...activeSessions.asMap().entries.map((entry) {
               return _buildSessionItem(entry.value, entry.key);
-            }).toList(),
+            }),
             
             const SizedBox(height: 40),
 

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'welcome.dart'; // Asumsikan Anda ingin kembali ke WelcomePage
+// Asumsikan Anda ingin kembali ke WelcomePage
 
 // Definisi Konstanta Warna (Sama dengan login.dart)
 const Color primaryColor = Color(0xFF2C3E50); // Biru Gelap
