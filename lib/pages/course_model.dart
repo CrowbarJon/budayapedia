@@ -11,16 +11,16 @@ class Course {
   final String title;
   final String category;
   final String description;
-  final List<String> contents; 
+  final List<String> contents;
   final String videoCount;
   final String duration;
-  final String imageUrl; 
+  final String imageUrl;
 
   Course({
     required this.title,
     required this.category,
     required this.description,
-    required this.contents, 
+    required this.contents,
     required this.videoCount,
     required this.duration,
     required this.imageUrl,
@@ -32,10 +32,11 @@ final List<Course> allCourses = [
   Course(
     title: "Filosofi Adat dan Rumah Gadang Minangkabau",
     category: "Adat",
-    description: "Pelajari sistem matrilineal, nilai-nilai luhur adat, dan arsitektur ikonik Rumah Gadang Sumatra Barat.",
+    description:
+        "Pelajari sistem matrilineal, nilai-nilai luhur adat, dan arsitektur ikonik Rumah Gadang Sumatra Barat.",
     videoCount: '18 videos',
     duration: "2h 20m",
-    imageUrl: 'assets/sumatra.jpg', 
+    imageUrl: 'assets/sumatra.jpg',
     contents: [
       "Memahami struktur sosial matrilineal Suku Minangkabau.",
       "Menjelaskan peran penting Bundo Kanduang dan Niniak Mamak dalam adat.",
@@ -46,7 +47,8 @@ final List<Course> allCourses = [
   Course(
     title: "Gerak Anggun Tari Klasik Keraton Jawa",
     category: "Seni",
-    description: "Pengenalan mendalam pada Tari Serimpi dan Bedhaya, termasuk filosofi di balik gerakan lembut dan busana penari Keraton.",
+    description:
+        "Pengenalan mendalam pada Tari Serimpi dan Bedhaya, termasuk filosofi di balik gerakan lembut dan busana penari Keraton.",
     videoCount: '12 videos',
     duration: "1h 15m",
     imageUrl: 'assets/tarikawa.jpg',
@@ -61,7 +63,8 @@ final List<Course> allCourses = [
   Course(
     title: "Manik-Manik dan Busana Adat Suku Dayak",
     category: "Kerajinan",
-    description: "Eksplorasi Pakaian Adat Dayak Kalimantan, fokus pada teknik pembuatan manik-manik, ukiran, dan busana King Baba/King Bibinge.",
+    description:
+        "Eksplorasi Pakaian Adat Dayak Kalimantan, fokus pada teknik pembuatan manik-manik, ukiran, dan busana King Baba/King Bibinge.",
     videoCount: '8 videos',
     duration: "2h 15m",
     imageUrl: 'assets/dayak.jpg',
@@ -75,7 +78,8 @@ final List<Course> allCourses = [
   Course(
     title: "Memasak Papeda dan Kuah Kuning Ikan Tongkol",
     category: "Makanan",
-    description: "Teknik dan resep spesifik untuk hidangan ikonik Papua. Belajar membuat Papeda dari sagu dan mengolahnya bersama Kuah Kuning Ikan Tongkol.",
+    description:
+        "Teknik dan resep spesifik untuk hidangan ikonik Papua. Belajar membuat Papeda dari sagu dan mengolahnya bersama Kuah Kuning Ikan Tongkol.",
     videoCount: '8 videos',
     duration: "2h 15m",
     imageUrl: 'assets/papeda.jpg',

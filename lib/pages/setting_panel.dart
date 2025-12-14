@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // BARU: Untuk Sign Out
 // BARU: Ganti dengan path ke halaman login/welcome Anda yang sebenarnya
-import 'package:budayapedia/pages/welcome.dart'; 
+import 'package:budayapedia/pages/welcome.dart';
 
 // Definisikan warna yang sama agar konsisten
 const Color primaryColor = Color(0xFF2C3E50);
@@ -22,7 +22,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
   bool _pushNotificationsEnabled = true;
   bool _newCourseAlertsEnabled = false;
   bool _useWifiEnabled = true;
-  
+
   // Widget pembantu untuk item pengaturan yang memiliki Toggle Switch
   Widget _buildSettingsToggle({
     required String title,
@@ -32,8 +32,17 @@ class _SettingsPanelState extends State<SettingsPanel> {
   }) {
     return ListTile(
       dense: true,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: darkTextColor)),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: lightTextColor)),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          color: darkTextColor,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(fontSize: 12, color: lightTextColor),
+      ),
       trailing: Switch(
         value: value,
         onChanged: onChanged, // Menerima fungsi onChanged dari luar
@@ -44,7 +53,13 @@ class _SettingsPanelState extends State<SettingsPanel> {
   }
 
   // Widget pembantu untuk item pengaturan standar (non-toggle)
-  Widget _buildSettingsTile(BuildContext context, IconData icon, String title, Color color, VoidCallback onTap) {
+  Widget _buildSettingsTile(
+    BuildContext context,
+    IconData icon,
+    String title,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title, style: TextStyle(color: darkTextColor)),
@@ -56,7 +71,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75, // Mengambil 75% tinggi layar
+      height:
+          MediaQuery.of(context).size.height *
+          0.75, // Mengambil 75% tinggi layar
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -77,7 +94,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             ),
           ),
           const SizedBox(height: 15),
-          
+
           Text(
             'Pengaturan Cepat',
             style: Theme.of(context).textTheme.headlineMedium!.copyWith(
@@ -113,7 +130,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   },
                 ),
                 const Divider(indent: 16, endIndent: 16, height: 1),
-                
+
                 // === OPSI DATA & STORAGE (TOGGLE) ===
                 _buildSettingsToggle(
                   title: 'Gunakan WiFi Saja',
@@ -159,29 +176,31 @@ class _SettingsPanelState extends State<SettingsPanel> {
                   Icons.logout,
                   'Logout',
                   Colors.red,
-                  () async { 
+                  () async {
                     Navigator.pop(context); // 1. Tutup panel settings
-                    
+
                     try {
-                        // 2. Lakukan sign out Firebase
-                        await FirebaseAuth.instance.signOut(); 
-                        
-                        // 3. Navigasi ke halaman awal (WelcomePage) dan HAPUS semua rute sebelumnya
-                        // Ganti WelcomePage() dengan nama Widget halaman login Anda yang sebenarnya
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const WelcomePage()), 
-                            (Route<dynamic> route) => false, 
-                        );
+                      // 2. Lakukan sign out Firebase
+                      await FirebaseAuth.instance.signOut();
+
+                      // 3. Navigasi ke halaman awal (WelcomePage) dan HAPUS semua rute sebelumnya
+                      // Ganti WelcomePage() dengan nama Widget halaman login Anda yang sebenarnya
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomePage(),
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
                     } catch (e) {
-                        print("Error saat sign out: $e");
-                        // Anda bisa menampilkan pesan error kepada pengguna di sini
+                      print("Error saat sign out: $e");
+                      // Anda bisa menampilkan pesan error kepada pengguna di sini
                     }
                   },
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

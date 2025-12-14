@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Definisikan warna (Konsisten)
-const Color primaryColor = Color(0xFF2C3E50); 
+const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
 const Color progressColor = Color(0xFF3498DB); // Biru untuk Progress
@@ -39,7 +39,10 @@ class FavoriteContentPage extends StatelessWidget {
   ];
 
   // Widget Kartu Materi Favorit
-  Widget _buildFavoriteCard(BuildContext context, Map<String, dynamic> content) {
+  Widget _buildFavoriteCard(
+    BuildContext context,
+    Map<String, dynamic> content,
+  ) {
     final bool isCompleted = content['progress'] == 1.0;
 
     return GestureDetector(
@@ -55,7 +58,11 @@ class FavoriteContentPage extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6, offset: const Offset(0, 3)),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
         child: Column(
@@ -71,10 +78,16 @@ class FavoriteContentPage extends StatelessWidget {
                 height: 120,
                 width: double.infinity,
                 color: primaryColor.withOpacity(0.1), // Placeholder warna
-                child: const Center(child: Icon(Icons.collections_bookmark, size: 40, color: primaryColor)),
+                child: const Center(
+                  child: Icon(
+                    Icons.collections_bookmark,
+                    size: 40,
+                    color: primaryColor,
+                  ),
+                ),
               ),
             ),
-            
+
             Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
@@ -83,14 +96,22 @@ class FavoriteContentPage extends StatelessWidget {
                   // 2. Kategori
                   Text(
                     content['category'] as String,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: progressColor),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: progressColor,
+                    ),
                   ),
                   const SizedBox(height: 5),
-                  
+
                   // 3. Judul
                   Text(
                     content['title'] as String,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkTextColor),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: darkTextColor,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -101,11 +122,18 @@ class FavoriteContentPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        isCompleted ? 'Selesai' : '${(content['progress'] * 100).toInt()}% Selesai',
-                        style: TextStyle(fontSize: 13, color: isCompleted ? successColor : lightTextColor),
+                        isCompleted
+                            ? 'Selesai'
+                            : '${(content['progress'] * 100).toInt()}% Selesai',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isCompleted ? successColor : lightTextColor,
+                        ),
                       ),
                       Icon(
-                        isCompleted ? Icons.check_circle : Icons.bookmark_added_outlined,
+                        isCompleted
+                            ? Icons.check_circle
+                            : Icons.bookmark_added_outlined,
                         color: isCompleted ? successColor : lightTextColor,
                         size: 18,
                       ),
@@ -115,7 +143,9 @@ class FavoriteContentPage extends StatelessWidget {
                   LinearProgressIndicator(
                     value: content['progress'] as double,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(isCompleted ? successColor : progressColor),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isCompleted ? successColor : progressColor,
+                    ),
                   ),
                 ],
               ),
@@ -131,7 +161,10 @@ class FavoriteContentPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Materi Favorit Saya', style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor)),
+        title: const Text(
+          'Materi Favorit Saya',
+          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+        ),
         backgroundColor: Colors.white,
         elevation: 1,
       ),
@@ -140,11 +173,21 @@ class FavoriteContentPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.bookmark_border, size: 80, color: lightTextColor.withOpacity(0.5)),
+                  Icon(
+                    Icons.bookmark_border,
+                    size: 80,
+                    color: lightTextColor.withOpacity(0.5),
+                  ),
                   const SizedBox(height: 15),
-                  const Text('Belum ada materi favorit!', style: TextStyle(fontSize: 18, color: lightTextColor)),
+                  const Text(
+                    'Belum ada materi favorit!',
+                    style: TextStyle(fontSize: 18, color: lightTextColor),
+                  ),
                   const SizedBox(height: 5),
-                  const Text('Tambahkan materi yang ingin Anda simpan dari kursus.', style: TextStyle(fontSize: 14, color: lightTextColor)),
+                  const Text(
+                    'Tambahkan materi yang ingin Anda simpan dari kursus.',
+                    style: TextStyle(fontSize: 14, color: lightTextColor),
+                  ),
                 ],
               ),
             )

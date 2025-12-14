@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 // Definisikan warna yang digunakan (Konsisten)
-const Color primaryColor = Color(0xFF2C3E50); 
+const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
 
@@ -12,17 +12,17 @@ class InfoHubPage extends StatelessWidget {
 
   // Data Konten Statis
   static const Map<String, String> _contentData = {
-    'Bantuan & FAQ': 
+    'Bantuan & FAQ':
         "FAQ:\n"
         "1. Bagaimana cara mengubah sandi? Anda dapat mengubah sandi melalui menu Akun > Keamanan Akun.\n"
         "2. Bagaimana cara melihat kemajuan belajar? Kunjungi Riwayat Pembelajaran dari halaman profil.\n"
         "3. Dukungan: Hubungi kami di support@budayapedia.id.",
-        
-    'Kebijakan Privasi': 
+
+    'Kebijakan Privasi':
         "Kebijakan Privasi BudayaPedia (Versi 2.1)\n\n"
         "Kami menghargai privasi Anda. Data pengguna (nama, email, riwayat belajar) dikumpulkan untuk tujuan personalisasi pengalaman belajar Anda. Kami tidak akan menjual atau menyewakan informasi pribadi Anda kepada pihak ketiga. Semua data sensitif dienkripsi dan dijamin keamanannya.",
-        
-    'Tentang Kami': 
+
+    'Tentang Kami':
         "BudayaPedia didirikan dengan visi melestarikan dan menyebarkan warisan budaya Indonesia kepada generasi muda melalui platform digital yang interaktif dan menyenangkan. Kami berkomitmen untuk menyediakan konten yang akurat dan mudah diakses. Terima kasih telah menjadi Pelestari Budaya!",
   };
 
@@ -52,15 +52,18 @@ class InfoHubPage extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          
-          if (title == 'Tentang Kami') 
-             Padding(
-                padding: const EdgeInsets.only(top: 15.0),
-                child: Text(
-                  'BudayaPedia Versi 1.5.2',
-                  style: TextStyle(fontSize: 12, color: lightTextColor.withOpacity(0.6)),
+
+          if (title == 'Tentang Kami')
+            Padding(
+              padding: const EdgeInsets.only(top: 15.0),
+              child: Text(
+                'BudayaPedia Versi 1.5.2',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: lightTextColor.withOpacity(0.6),
                 ),
-             ),
+              ),
+            ),
         ],
       ),
     );
@@ -71,7 +74,10 @@ class InfoHubPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Pusat Informasi BudayaPedia', style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor)),
+        title: const Text(
+          'Pusat Informasi BudayaPedia',
+          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+        ),
         backgroundColor: Colors.white,
         elevation: 1,
       ),
@@ -99,11 +105,8 @@ class InfoHubPage extends StatelessWidget {
             ),
 
             // --- 3. TENTANG KAMI (KONTEN LANGSUNG) ---
-            _buildContentSection(
-              'Tentang Kami',
-              _contentData['Tentang Kami']!,
-            ),
-            
+            _buildContentSection('Tentang Kami', _contentData['Tentang Kami']!),
+
             const SizedBox(height: 20),
           ],
         ),

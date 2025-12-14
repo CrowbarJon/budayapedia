@@ -47,10 +47,9 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
         "Link reset password telah dikirim ke $email. Mohon cek email Anda.",
         Colors.green,
       );
-      
+
       // Kembali ke halaman Login
       Navigator.of(context).pop();
-
     } on FirebaseAuthException catch (e) {
       String message;
       if (e.code == 'user-not-found') {
@@ -74,12 +73,9 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
 
   void _showSnackBar(String message, Color color) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: color,
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
     }
   }
 
@@ -122,7 +118,9 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 prefixIcon: const Icon(Icons.email_outlined, color: grayColor),
-                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: primaryColor, width: 2.0),
                   borderRadius: BorderRadius.circular(10),
@@ -138,14 +136,19 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 55),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 elevation: 5,
               ),
               child: _isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text(
                       "KIRIM LINK RESET",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
           ],

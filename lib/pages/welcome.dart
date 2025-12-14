@@ -18,7 +18,7 @@ class WelcomePage extends StatelessWidget {
       // Navigasi ke LoginPage dan hapus semua rute sebelumnya
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const LoginPage()),
-            (Route<dynamic> route) => false,
+        (Route<dynamic> route) => false,
       );
 
       print('Pengguna berhasil Logout!');
@@ -32,7 +32,10 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       // --- BARU: AppBar dengan Tombol Logout ---
       appBar: AppBar(
-        title: const Text('BudayaPedia', style: TextStyle(color: Color(0xFF1E2A3B))),
+        title: const Text(
+          'BudayaPedia',
+          style: TextStyle(color: Color(0xFF1E2A3B)),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -55,10 +58,7 @@ class WelcomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     // Gambar Logo
-                    Image.asset(
-                      'assets/budayapedia.png',
-                      height: 150,
-                    ),
+                    Image.asset('assets/budayapedia.png', height: 150),
                     const SizedBox(height: 16),
                     // Judul Aplikasi
                     const Text(
@@ -100,14 +100,19 @@ class WelcomePage extends StatelessWidget {
                         // Untuk saat ini, kita biarkan navigasi ke LoginPage sesuai kode lama
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
                         );
                         print('Mulai Pembelajaran ditekan!');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2C3E50),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 60,
+                          vertical: 16,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -115,7 +120,10 @@ class WelcomePage extends StatelessWidget {
                       ),
                       child: const Text(
                         'Mulai Pembelajaran',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -129,7 +137,10 @@ class WelcomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: const <Widget>[
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 20.0,
+                      ),
                       child: Text(
                         'By continuing, you agree to share contact information with people in your class. Google Classroom uses Google Workspace services, including Drive and Calendar. Learn more about information sharing and Classroom',
                         textAlign: TextAlign.center,

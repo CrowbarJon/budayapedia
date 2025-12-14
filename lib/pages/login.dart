@@ -37,9 +37,9 @@ class _LoginPageState extends State<LoginPage> {
   // Helper untuk menampilkan pesan error
   void _showSnackBar(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -90,11 +90,11 @@ class _LoginPageState extends State<LoginPage> {
 
       if (user != null) {
         // 2. LOGIKA BARU: CEK VERIFIKASI EMAIL
-        
+
         // Memuat ulang data pengguna untuk mendapatkan status verifikasi terbaru
-        await user.reload(); 
+        await user.reload();
         user = _auth.currentUser; // Update objek user setelah reload
-        
+
         if (user!.emailVerified) {
           // Email terverifikasi: Lanjutkan ke Home Page
           if (mounted) {
@@ -106,10 +106,11 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           // Email belum diverifikasi: Tampilkan pesan dan logout pengguna
           await _auth.signOut(); // Logout pengguna yang belum terverifikasi
-          _showSnackBar('Login Gagal. Email Anda belum diverifikasi. Mohon cek inbox Anda.');
+          _showSnackBar(
+            'Login Gagal. Email Anda belum diverifikasi. Mohon cek inbox Anda.',
+          );
         }
       }
-
     } on FirebaseAuthException catch (e) {
       String message;
       if (e.code == 'user-not-found') {
@@ -122,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
         message = 'Login Gagal: ${e.message}';
       }
       _showSnackBar(message);
-
     } catch (e) {
       _showSnackBar('Terjadi kesalahan tak terduga.');
       debugPrint('Error Login: $e');
@@ -142,7 +142,8 @@ class _LoginPageState extends State<LoginPage> {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -154,7 +155,6 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
-
     } on FirebaseAuthException catch (e) {
       _showSnackBar('Google Sign-In Gagal: ${e.message}');
     } catch (e) {
@@ -185,10 +185,7 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               // --- 1. Logo dan Judul ---
-              Image.asset(
-                'assets/budayapedia.png',
-                height: 80,
-              ),
+              Image.asset('assets/budayapedia.png', height: 80),
               const SizedBox(height: 10),
               const Text(
                 'BudayaPedia',
@@ -217,7 +214,14 @@ class _LoginPageState extends State<LoginPage> {
               // --- 2. Input Email/Username ---
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Email or Username', style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontFamily: 'DMSans')),
+                child: Text(
+                  'Email or Username',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'DMSans',
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -226,8 +230,13 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: const InputDecoration(
                   hintText: 'youremail@example.com',
                   hintStyle: TextStyle(color: grayColor, fontFamily: 'DMSans'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                  contentPadding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 15.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 15.0,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -235,7 +244,14 @@ class _LoginPageState extends State<LoginPage> {
               // --- 3. Input Password ---
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Password', style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontFamily: 'DMSans')),
+                child: Text(
+                  'Password',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'DMSans',
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -243,13 +259,24 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: '12345',
-                  hintStyle: const TextStyle(color: grayColor, fontFamily: 'DMSans'),
-                  border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 15.0),
+                  hintStyle: const TextStyle(
+                    color: grayColor,
+                    fontFamily: 'DMSans',
+                  ),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 15.0,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: grayColor),
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: grayColor,
+                    ),
                     onPressed: _toggleVisibility,
                   ),
                 ),
@@ -272,7 +299,13 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         activeColor: primaryColor,
                       ),
-                      const Text('Remember me', style: TextStyle(color: grayColor, fontFamily: 'DMSans')),
+                      const Text(
+                        'Remember me',
+                        style: TextStyle(
+                          color: grayColor,
+                          fontFamily: 'DMSans',
+                        ),
+                      ),
                     ],
                   ),
                   TextButton(
@@ -280,10 +313,19 @@ class _LoginPageState extends State<LoginPage> {
                       // >>> LOGIKA BARU: NAVIGASI KE LUPA PASSWORD PAGE <<<
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LupaPasswordPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const LupaPasswordPage(),
+                        ),
                       );
                     },
-                    child: const Text('Forgot password?', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600, fontFamily: 'DMSans')),
+                    child: const Text(
+                      'Forgot password?',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'DMSans',
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -307,20 +349,23 @@ class _LoginPageState extends State<LoginPage> {
 
                   child: _isLoading
                       ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          strokeWidth: 3,
-                        ),
-                      )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                            strokeWidth: 3,
+                          ),
+                        )
                       : const Text(
                           'Sign In',
                           style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'DMSans')
-                      ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'DMSans',
+                          ),
+                        ),
                 ),
               ),
 
@@ -331,28 +376,22 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     // Garis kiri
                     const Expanded(
-                      child: Divider(
-                        color: grayColor,
-                        thickness: 1.0,
-                      ),
+                      child: Divider(color: grayColor, thickness: 1.0),
                     ),
                     // Teks 'or' di tengah
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
-                          'or',
-                          style: TextStyle(
-                              color: grayColor,
-                              fontFamily: 'DMSans'
-                          )
+                        'or',
+                        style: TextStyle(
+                          color: grayColor,
+                          fontFamily: 'DMSans',
+                        ),
                       ),
                     ),
                     // Garis kanan
                     const Expanded(
-                      child: Divider(
-                        color: grayColor,
-                        thickness: 1.0,
-                      ),
+                      child: Divider(color: grayColor, thickness: 1.0),
                     ),
                   ],
                 ),
@@ -376,17 +415,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Image.asset(
-                        'assets/google.png',
-                        height: 20,
-                      ),
+                      Image.asset('assets/google.png', height: 20),
                       const SizedBox(width: 10),
                       const Text(
                         'Sign in with Google',
                         style: TextStyle(
-                            fontSize: 18,
-                            color: textColor,
-                            fontFamily: 'DMSans'
+                          fontSize: 18,
+                          color: textColor,
+                          fontFamily: 'DMSans',
                         ),
                       ),
                     ],
@@ -399,15 +435,27 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account? ", style: TextStyle(color: textColor, fontFamily: 'DMSans')),
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(color: textColor, fontFamily: 'DMSans'),
+                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignUpPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpPage(),
+                        ),
                       );
                     },
-                    child: const Text('Sign up', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600, fontFamily: 'DMSans')),
+                    child: const Text(
+                      'Sign up',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'DMSans',
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -49,12 +49,12 @@ class MyApp extends StatelessWidget {
           // Arahkan ke Halaman Utama (Dashboard)
           if (snapshot.hasData && snapshot.data != null) {
             // *** PERBAIKAN UTAMA: Mengganti WelcomePage() menjadi HomePage() ***
-            return const HomePage(); 
+            return const HomePage();
           }
 
           // KASUS 2: Jika tidak ada data user (belum login/sudah logout):
           // Arahkan ke Halaman Login
-          return const LoginPage(); 
+          return const LoginPage();
         },
       ),
       // ^^^ LOGIKA UTAMA NAVIGASI APLIKASI ^^^

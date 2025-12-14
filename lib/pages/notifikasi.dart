@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-// Konstanta Warna 
-const Color primaryColor = Color(0xFF2C3E50); 
-const Color darkTextColor = Color(0xFF1E2A3B); 
+// Konstanta Warna
+const Color primaryColor = Color(0xFF2C3E50);
+const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
 
-// Widget Notifikasi 
+// Widget Notifikasi
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
@@ -18,7 +18,8 @@ class _NotificationPageState extends State<NotificationPage> {
   List<Map<String, dynamic>> notifications = [
     {
       'title': 'Peringatan Kursus Baru!',
-      'body': 'Chef William Wibowo telah mengunggah modul baru "Rendang: Filosofi Rasa".',
+      'body':
+          'Chef William Wibowo telah mengunggah modul baru "Rendang: Filosofi Rasa".',
       'time': '3 menit lalu',
       'isRead': false,
       'icon': Icons.school,
@@ -34,7 +35,8 @@ class _NotificationPageState extends State<NotificationPage> {
     },
     {
       'title': 'Promo: Diskon 50%',
-      'body': 'Dapatkan diskon 50% untuk semua kursus di kategori "Jawa" minggu ini!',
+      'body':
+          'Dapatkan diskon 50% untuk semua kursus di kategori "Jawa" minggu ini!',
       'time': 'Kemarin',
       'isRead': true,
       'icon': Icons.local_offer,
@@ -49,13 +51,13 @@ class _NotificationPageState extends State<NotificationPage> {
       'color': Colors.grey,
     },
   ];
-  
+
   // Fungsi untuk menghapus semua notifikasi
   void _clearAllNotifications() {
     setState(() {
       notifications.clear(); // Mengosongkan daftar notifikasi
     });
-    // Tampilkan pesan konfirmasi 
+    // Tampilkan pesan konfirmasi
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Semua notifikasi dibersihkan!')),
     );
@@ -64,14 +66,19 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     // Memisahkan notifikasi berdasarkan status baca
-    final List<Map<String, dynamic>> unreadNotifications = 
-        notifications.where((n) => !n['isRead']).toList();
-    final List<Map<String, dynamic>> readNotifications = 
-        notifications.where((n) => n['isRead']).toList();
+    final List<Map<String, dynamic>> unreadNotifications = notifications
+        .where((n) => !n['isRead'])
+        .toList();
+    final List<Map<String, dynamic>> readNotifications = notifications
+        .where((n) => n['isRead'])
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifikasi', style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor)),
+        title: const Text(
+          'Notifikasi',
+          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: darkTextColor),
@@ -80,11 +87,13 @@ class _NotificationPageState extends State<NotificationPage> {
             // Tombol Clear All hanya aktif jika ada notifikasi
             onPressed: notifications.isEmpty ? null : _clearAllNotifications,
             child: Text(
-              'Bersihkan Semua', 
+              'Bersihkan Semua',
               style: TextStyle(
                 // Mengubah warna teks jika tombol dinonaktifkan
-                color: notifications.isEmpty ? lightTextColor.withOpacity(0.5) : primaryColor
-              )
+                color: notifications.isEmpty
+                    ? lightTextColor.withOpacity(0.5)
+                    : primaryColor,
+              ),
             ),
           ),
         ],
@@ -96,7 +105,7 @@ class _NotificationPageState extends State<NotificationPage> {
             // Notifikasi Belum Dibaca
             if (unreadNotifications.isNotEmpty)
               _buildNotificationSection(
-                context, 
+                context,
                 title: 'Notifikasi Baru (${unreadNotifications.length})',
                 notifications: unreadNotifications,
                 isUnread: true,
@@ -105,7 +114,7 @@ class _NotificationPageState extends State<NotificationPage> {
             // Notifikasi Lama
             if (readNotifications.isNotEmpty)
               _buildNotificationSection(
-                context, 
+                context,
                 title: 'Terdahulu',
                 notifications: readNotifications,
                 isUnread: false,
@@ -118,9 +127,16 @@ class _NotificationPageState extends State<NotificationPage> {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(Icons.notifications_off, size: 60, color: Colors.grey[300]),
+                      Icon(
+                        Icons.notifications_off,
+                        size: 60,
+                        color: Colors.grey[300],
+                      ),
                       const SizedBox(height: 16),
-                      Text('Tidak ada notifikasi saat ini.', style: TextStyle(color: lightTextColor, fontSize: 16)),
+                      Text(
+                        'Tidak ada notifikasi saat ini.',
+                        style: TextStyle(color: lightTextColor, fontSize: 16),
+                      ),
                     ],
                   ),
                 ),
@@ -143,7 +159,14 @@ class _NotificationPageState extends State<NotificationPage> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkTextColor)),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: darkTextColor,
+            ),
+          ),
         ),
         ...notifications.map((notification) {
           return _buildNotificationItem(
@@ -159,7 +182,7 @@ class _NotificationPageState extends State<NotificationPage> {
       ],
     );
   }
-  
+
   // Widget pembangun tiap item notifikasi
   Widget _buildNotificationItem({
     required String title,
@@ -170,7 +193,7 @@ class _NotificationPageState extends State<NotificationPage> {
     required bool isUnread,
   }) {
     return Container(
-      color: isUnread ? primaryColor.withOpacity(0.05) : Colors.white, 
+      color: isUnread ? primaryColor.withOpacity(0.05) : Colors.white,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: color.withOpacity(0.1),
@@ -186,7 +209,12 @@ class _NotificationPageState extends State<NotificationPage> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(body, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: darkTextColor)),
+            Text(
+              body,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: darkTextColor),
+            ),
             const SizedBox(height: 4),
             Text(
               time,
@@ -198,9 +226,13 @@ class _NotificationPageState extends State<NotificationPage> {
             ),
           ],
         ),
-        trailing: isUnread 
-          ? const Icon(Icons.circle, size: 10, color: Colors.red) // Indikator belum dibaca
-          : null,
+        trailing: isUnread
+            ? const Icon(
+                Icons.circle,
+                size: 10,
+                color: Colors.red,
+              ) // Indikator belum dibaca
+            : null,
         onTap: () {
           // [TODO] Tambahkan aksi saat notifikasi di-klik
         },

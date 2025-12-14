@@ -6,8 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 // Definisi Konstanta Warna (Sama dengan login.dart)
 const Color primaryColor = Color(0xFF2C3E50); // Biru Gelap
-const Color textColor = Color(0xFF1E2A3B);  // Teks Gelap
-const Color grayColor = Color(0xFF5A6B80);  // Teks Abu-abu
+const Color textColor = Color(0xFF1E2A3B); // Teks Gelap
+const Color grayColor = Color(0xFF5A6B80); // Teks Abu-abu
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,7 +19,8 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -48,7 +49,6 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -56,17 +56,18 @@ class _SignUpPageState extends State<SignUpPage> {
 
     try {
       // 1. Panggil metode pendaftaran Firebase
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
       User? user = userCredential.user;
 
       if (user != null) {
         // 2. >>> MODIFIKASI: KIRIM EMAIL VERIFIKASI <<<
         await user.sendEmailVerification();
-        
+
         // 3. Navigasi dan Pemberitahuan setelah pendaftaran dan pengiriman email
         if (mounted) {
           // Tampilkan pesan sukses dalam SnackBar
@@ -83,7 +84,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
           // Navigasi kembali ke halaman Login
           // Karena pengguna harus login setelah memverifikasi email mereka
-          Navigator.of(context).pop(); 
+          Navigator.of(context).pop();
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -117,9 +118,11 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         // Set warna latar belakang AppBar menjadi putih atau transparan untuk look modern
-        backgroundColor: Colors.white, 
+        backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: primaryColor), // Warna ikon panah kembali
+        iconTheme: const IconThemeData(
+          color: primaryColor,
+        ), // Warna ikon panah kembali
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30.0),
@@ -149,7 +152,9 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 prefixIcon: const Icon(Icons.email_outlined, color: grayColor),
-                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 labelStyle: const TextStyle(color: grayColor),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: primaryColor, width: 2.0),
@@ -166,7 +171,9 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(
                 labelText: 'Password (min. 6 karakter)',
                 prefixIcon: const Icon(Icons.lock_outline, color: grayColor),
-                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 labelStyle: const TextStyle(color: grayColor),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: primaryColor, width: 2.0),
@@ -183,7 +190,9 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(
                 labelText: 'Konfirmasi Password',
                 prefixIcon: const Icon(Icons.lock_reset, color: grayColor),
-                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 labelStyle: const TextStyle(color: grayColor),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: primaryColor, width: 2.0),
@@ -192,14 +201,17 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Tampilkan Pesan Error
-            if (_errorMessage != null) 
+            if (_errorMessage != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 15.0),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
 
@@ -210,18 +222,23 @@ class _SignUpPageState extends State<SignUpPage> {
                 backgroundColor: primaryColor, // Warna Biru Gelap
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 55),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 elevation: 5,
               ),
               child: _isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text(
                       "DAFTAR",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
             const SizedBox(height: 20),
-            
+
             // Opsi Kembali ke Login
             TextButton(
               onPressed: () {
