@@ -1,17 +1,18 @@
-// lib/module_content_model.dart
+// lib/models/module_content_model.dart
 
 class ModuleContent {
   final String title;
-  final String duration;
+  // duration sudah dihapus
   final String contentTitle;
-  final String contentText;
+  // UBAH TIPE INI menjadi List<String>
+  final List<String> contentText; 
   final bool isQuiz;
 
   ModuleContent({
     required this.title,
-    required this.duration,
+    // duration sudah dihapus
     required this.contentTitle,
-    required this.contentText,
+    required this.contentText, // Tipe List<String>
     this.isQuiz = false,
   });
 }

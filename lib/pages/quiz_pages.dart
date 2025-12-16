@@ -25,6 +25,7 @@ class _QuizPageState extends State<QuizPage> {
     int _score = 0;
     bool _answerWasPicked = false;
     String? _selectedAnswer; // Ini diperlukan untuk menyimpan jawaban yang dipilih
+    late List<Question> _questions;
 
     // --- LOGIKA UTAMA & NAVIGASI ---
 
@@ -58,68 +59,71 @@ class _QuizPageState extends State<QuizPage> {
         });
     }
 
-    void _showResultsDialog() {
-        final double passRate = 0.6; 
-        final bool passed = _score >= widget.quizData.questions.length * passRate;
+void _showResultsDialog() {
+    final double passRate = 0.6; 
+    final bool passed = _score >= widget.quizData.questions.length * passRate;
 
-        showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-                return AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    title: Text(passed ? '🎉 Kuis Lulus!' : '😔 Kuis Gagal!'),
-                    content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                            Text(
-                                'Skor Akhir Anda: $_score dari ${widget.quizData.questions.length}',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                                passed 
-                                    ? 'Selamat! Anda menguasai materi ini dan dapat melanjutkan.' 
-                                    : 'Skor Anda di bawah 60%. Anda harus ulangi kuis untuk melanjutkan.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: passed ? correctColor : incorrectColor),
-                            ),
-                        ],
-                    ),
-                    actions: [
-                        TextButton(
-                            onPressed: () {
-                                Navigator.popUntil(context, (route) => route.isFirst); 
-                            },
-                            child: const Text('Keluar Kursus'),
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+            return AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                title: Text(passed ? '🎉 Kuis Lulus!' : '😔 Kuis Gagal!'),
+                content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                        Text(
+                            'Skor Akhir Anda: $_score dari ${widget.quizData.questions.length}',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
                         ),
-                        if (!passed)
-                            ElevatedButton(
-                                onPressed: () {
-                                    Navigator.pop(context); 
-                                    setState(() {
-                                        _currentQuestionIndex = 0;
-                                        _score = 0;
-                                        _answerWasPicked = false;
-                                        _selectedAnswer = null;
-                                    });
-                                },
-                                style: ElevatedButton.styleFrom(backgroundColor: accentColor),
-                                child: const Text('Ulangi Kuis', style: TextStyle(color: Colors.white)),
-                            )
-                        else
-                            ElevatedButton(
-                                onPressed: () {
-                                    Navigator.pop(context, true); 
-                                },
-                                style: ElevatedButton.styleFrom(backgroundColor: correctColor),
-                                child: const Text('Lanjut Modul Berikutnya', style: TextStyle(color: Colors.white)),
-                            ),
+                        const SizedBox(height: 10),
+                        Text(
+                            passed 
+                                ? 'Selamat! Anda menguasai materi ini dan dapat melanjutkan.' 
+                                : 'Skor Anda di bawah 60%. Anda harus ulangi kuis untuk melanjutkan.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: passed ? correctColor : incorrectColor),
+                        ),
                     ],
-                );
-            }
-        );
-    }
+                ),
+                actions: [
+                    TextButton(
+                        onPressed: () {
+                            Navigator.pop(context); // Tutup dialog
+                            Navigator.pop(context, false); // Return false = gagal/keluar
+                        },
+                        child: const Text('Keluar Kursus'),
+                    ),
+                    if (!passed)
+                        ElevatedButton(
+                            onPressed: () {
+                                Navigator.pop(context); // Tutup dialog
+                                setState(() {
+                                    _currentQuestionIndex = 0;
+                                    _score = 0;
+                                    _answerWasPicked = false;
+                                    _selectedAnswer = null;
+                                });
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: accentColor),
+                            child: const Text('Ulangi Kuis', style: TextStyle(color: Colors.white)),
+                        )
+                    else
+                        ElevatedButton(
+                            onPressed: () {
+                                Navigator.pop(context); // Tutup dialog dulu
+                                Navigator.pop(context, true); // Baru return true = lulus
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: correctColor),
+                            child: const Text('Lanjut Modul Berikutnya', style: TextStyle(color: Colors.white)),
+                        ),
+                ],
+            );
+        }
+    );
+}
+
 
     // --- WIDGET PEMBANGUN UI (DIPERBAIKI: Error Tipe Data, Visual & Typos) ---
 

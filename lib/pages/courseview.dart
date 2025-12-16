@@ -131,7 +131,7 @@ class CourseDetailsView extends StatelessWidget {
                       const Icon(Icons.person, size: 18, color: lightTextColor),
                       const SizedBox(width: 4),
                       const Text(
-                        'John Smith',
+                        'Ibrahim Datuak Sangguno Dirajo',
                         style: TextStyle(fontSize: 14, color: lightTextColor),
                       ),
                     ],

@@ -27,7 +27,6 @@ class Course {
   });
 }
 
-// DATA KURSUS (Dipindahkan dari mycourse.dart)
 final List<Course> allCourses = [
   Course(
     title: "Filosofi Adat dan Rumah Gadang Minangkabau",
