@@ -5,8 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'device_security_page.dart';
 
 const Color primaryColor = Color(0xFF2C3E50);
-const Color darkTextColor = Color(0xFF1E2A3B);
-const Color lightTextColor = Color(0xFF5A6B80);
+// const Color darkTextColor = Color(0xFF1E2A3B); // [DIHAPUS] Biar dinamis
+// const Color lightTextColor = Color(0xFF5A6B80); // [DIHAPUS] Biar dinamis
 const Color successColor = Color(0xFF27AE60);
 const Color warningColor = Color(0xFFE67E22);
 
@@ -27,10 +27,8 @@ class _SecurityPageState extends State<SecurityPage> {
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  // --- FUNGSI NOTIFIKASI EMAIL (PLACEHOLDER UNTUK BACKEND) ---
+  // --- FUNGSI NOTIFIKASI EMAIL (PLACEHOLDER) ---
   void _sendSecurityEmailNotification(String action) {
-    // Ini adalah placeholder. Di produksi, fungsi ini akan memanggil Cloud Function/API
-    // untuk mengirim notifikasi keamanan (bukan kode OTP) ke email pengguna.
     if (user != null) {
       debugPrint(
         "SIMULASI EMAIL: Notifikasi keamanan '$action' dikirim ke ${user!.email}",
@@ -38,7 +36,7 @@ class _SecurityPageState extends State<SecurityPage> {
     }
   }
 
-  // FUNGSI UTILITY: Menampilkan Snackbar Keberhasilan Aksi
+  // FUNGSI UTILITY: Menampilkan Snackbar
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -119,9 +117,7 @@ class _SecurityPageState extends State<SecurityPage> {
                     String msg = e.code == 'wrong-password'
                         ? "Sandi Lama salah."
                         : "Gagal: ${e.message}";
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(msg)));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
                   } catch (e) {
                     if (mounted) Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -138,9 +134,7 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  // --- 2. UBAH EMAIL (Dua Tahap OTP) ---
-
-  // 2a. Permintaan OTP untuk Ubah Email (Memanggil fungsi pengiriman OTP yang sebenarnya/placeholder)
+  // --- 2. UBAH EMAIL ---
   Future<void> _showChangeEmailOTPRequest() async {
     await showDialog(
       context: context,
@@ -158,10 +152,7 @@ class _SecurityPageState extends State<SecurityPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Di sini Anda akan memanggil Cloud Function untuk mengirim OTP NYATA
-                // Jika sukses:
                 _sendOtpAndShowVerificationDialog();
-                // >>> PESAN SIMULASI DIHAPUS, DIGANTI PESAN SUKSES ASLI <<<
                 _showSuccessSnackbar(
                   "Kode OTP telah diminta. Harap cek email Anda!",
                 );
@@ -174,7 +165,6 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  // 2b. Dialog Verifikasi OTP dan Masukkan Email Baru
   void _sendOtpAndShowVerificationDialog() {
     _otpController.clear();
     _emailController.clear();
@@ -218,9 +208,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 final otp = _otpController.text.trim();
                 final newEmail = _emailController.text.trim();
 
-                // >>> VALIDASI OTP (INI HARUS DIGANTI DENGAN VERIFIKASI BACKEND) <<<
                 if (otp.isEmpty || otp != "123456") {
-                  // Kode '123456' masih simulasi di sini
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Kode OTP salah atau kedaluwarsa!"),
@@ -265,8 +253,6 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   // --- 3. VERIFIKASI DUA LANGKAH (2FA) ---
-
-  // 3a. Proses Aktivasi 2FA (Langkah 1: Permintaan OTP)
   Future<void> _show2faOtpRequest() async {
     await showDialog(
       context: context,
@@ -284,10 +270,7 @@ class _SecurityPageState extends State<SecurityPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Di sini Anda akan memanggil Cloud Function untuk mengirim OTP NYATA
-                // Jika sukses:
                 _show2faOtpVerificationDialog();
-                // >>> PESAN SIMULASI DIHAPUS, DIGANTI PESAN SUKSES ASLI <<<
                 _showSuccessSnackbar(
                   "Kode OTP 2FA telah diminta. Harap cek email Anda!",
                 );
@@ -300,7 +283,6 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  // 3b. Proses Aktivasi 2FA (Langkah 2: Verifikasi OTP)
   void _show2faOtpVerificationDialog() {
     _otpController.clear();
 
@@ -328,9 +310,7 @@ class _SecurityPageState extends State<SecurityPage> {
               onPressed: () async {
                 final otp = _otpController.text.trim();
 
-                // >>> VALIDASI OTP 2FA (INI HARUS DIGANTI DENGAN VERIFIKASI BACKEND) <<<
                 if (otp.isEmpty || otp != "654321") {
-                  // Kode '654321' masih simulasi di sini
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Kode OTP salah atau kedaluwarsa!"),
@@ -339,7 +319,6 @@ class _SecurityPageState extends State<SecurityPage> {
                   return;
                 }
 
-                // AKTIVASI 2FA BERHASIL
                 if (mounted) {
                   setState(() {
                     _is2faEnabled = true;
@@ -359,7 +338,6 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  // 3c. Proses Deaktivasi 2FA (Konfirmasi Saja)
   Future<void> _show2faDeactivationConfirmation() async {
     await showDialog(
       context: context,
@@ -394,7 +372,7 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  // --- 4. RIWAYAT DAN SESI (Navigasi Riil) ---
+  // --- 4. RIWAYAT DAN SESI ---
   void _navigateToDeviceSecurity() {
     Navigator.push(
       context,
@@ -403,24 +381,31 @@ class _SecurityPageState extends State<SecurityPage> {
     _sendSecurityEmailNotification("Akses Riwayat Keamanan");
   }
 
-  // --- WIDGET PEMBANGUN UI ---
+  // --- WIDGET PEMBANGUN UI (DENGAN TEMA DINAMIS) ---
   Widget _buildSecurityCard(
     IconData icon,
     String title,
     String subtitle,
     VoidCallback onTap,
   ) {
+    // [LOGIKA WARNA DINAMIS]
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    Color textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    Color subTextColor = Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor, // Menggunakan warna dinamis
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              // Shadow lebih halus di dark mode
+              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -443,21 +428,21 @@ class _SecurityPageState extends State<SecurityPage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: darkTextColor,
+                      color: textColor, // Warna teks dinamis
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12, color: lightTextColor),
+                    style: TextStyle(fontSize: 12, color: subTextColor), // Warna teks dinamis
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: lightTextColor),
+            Icon(Icons.chevron_right, color: subTextColor),
           ],
         ),
       ),
@@ -470,15 +455,21 @@ class _SecurityPageState extends State<SecurityPage> {
     String subtitle,
     bool value,
   ) {
+    // [LOGIKA WARNA DINAMIS]
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    Color textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    Color subTextColor = Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor, // Menggunakan warna dinamis
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -501,16 +492,16 @@ class _SecurityPageState extends State<SecurityPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: darkTextColor,
+                    color: textColor, // Warna teks dinamis
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 12, color: lightTextColor),
+                  style: TextStyle(fontSize: 12, color: subTextColor), // Warna teks dinamis
                 ),
               ],
             ),
@@ -538,15 +529,18 @@ class _SecurityPageState extends State<SecurityPage> {
         ? "Status Keamanan: Baik"
         : "Status Keamanan: Perlu Perhatian";
     final Color statusColor = isSecurityGood ? successColor : warningColor;
+    
+    // Warna teks sub-header
+    final Color subHeaderColor = Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white, // [DIHAPUS] Agar ikut tema
       appBar: AppBar(
         title: const Text(
           'Keamanan Akun',
-          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+          style: TextStyle(fontWeight: FontWeight.bold), // Warna otomatis
         ),
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white, // [DIHAPUS] Agar ikut tema
         elevation: 1,
       ),
       body: SingleChildScrollView(
@@ -554,7 +548,7 @@ class _SecurityPageState extends State<SecurityPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 1. KARTU STATUS KEAMANAN (Visual) ---
+            // --- 1. KARTU STATUS KEAMANAN ---
             Container(
               padding: const EdgeInsets.all(18),
               width: double.infinity,
@@ -583,9 +577,9 @@ class _SecurityPageState extends State<SecurityPage> {
                             color: statusColor,
                           ),
                         ),
-                        const Text(
+                        Text(
                           "Keamanan yang kuat melindungi data BudayaPedia Anda.",
-                          style: TextStyle(fontSize: 12, color: lightTextColor),
+                          style: TextStyle(fontSize: 12, color: subHeaderColor),
                         ),
                       ],
                     ),
@@ -596,13 +590,13 @@ class _SecurityPageState extends State<SecurityPage> {
 
             const SizedBox(height: 30),
 
-            // --- 2. PENGATURAN UTAMA (Akses) ---
-            const Text(
+            // --- 2. PENGATURAN UTAMA ---
+            Text(
               'Akses dan Verifikasi',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: lightTextColor,
+                color: subHeaderColor,
               ),
             ),
             const SizedBox(height: 10),
@@ -623,7 +617,7 @@ class _SecurityPageState extends State<SecurityPage> {
               _showChangeEmailOTPRequest,
             ),
 
-            // 3. Verifikasi Dua Langkah (2FA) dengan Toggle Interaktif
+            // 3. Verifikasi Dua Langkah (2FA)
             _buildToggleSecurityCard(
               Icons.security,
               'Verifikasi Dua Langkah (2FA)',
@@ -636,12 +630,12 @@ class _SecurityPageState extends State<SecurityPage> {
             const SizedBox(height: 30),
 
             // --- 3. RIWAYAT DAN SESI ---
-            const Text(
+            Text(
               'Aktivitas dan Perangkat',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: lightTextColor,
+                color: subHeaderColor,
               ),
             ),
             const SizedBox(height: 10),

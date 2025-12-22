@@ -1,11 +1,10 @@
-// info_hub_page.dart (REVISI TOTAL: HALAMAN KONTEN TUNGGAL)
+// info_hub_page.dart
 
 import 'package:flutter/material.dart';
 
-// Definisikan warna yang digunakan (Konsisten)
+// Definisikan warna yang digunakan
 const Color primaryColor = Color(0xFF2C3E50);
-const Color darkTextColor = Color(0xFF1E2A3B);
-const Color lightTextColor = Color(0xFF5A6B80);
+// Warna teks hardcode dihapus agar bisa dinamis mengikuti tema
 
 class InfoHubPage extends StatelessWidget {
   const InfoHubPage({super.key});
@@ -27,7 +26,17 @@ class InfoHubPage extends StatelessWidget {
   };
 
   // Widget untuk menampilkan setiap bagian konten (FAQ, Privasi, Tentang)
-  Widget _buildContentSection(String title, String content) {
+  // [PERUBAHAN]: Menambahkan parameter 'context' untuk mendeteksi Tema
+  Widget _buildContentSection(BuildContext context, String title, String content) {
+    // Cek apakah Dark Mode aktif
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    // Warna Judul: Biru tua di Light Mode, Putih di Dark Mode (agar terbaca)
+    Color titleColor = isDarkMode ? Colors.white : primaryColor;
+    
+    // Warna Isi: Hitam di Light Mode, Abu terang di Dark Mode
+    Color contentColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 30.0),
       child: Column(
@@ -36,19 +45,19 @@ class InfoHubPage extends StatelessWidget {
           // Judul Section
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: primaryColor,
+              color: titleColor, // Warna dinamis
             ),
           ),
           const SizedBox(height: 10),
           // Isi Konten
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: darkTextColor,
+              color: contentColor, // Warna dinamis
               height: 1.5,
             ),
           ),
@@ -60,7 +69,8 @@ class InfoHubPage extends StatelessWidget {
                 'BudayaPedia Versi 1.5.2',
                 style: TextStyle(
                   fontSize: 12,
-                  color: lightTextColor.withOpacity(0.6),
+                  // Warna teks versi (agak transparan)
+                  color: contentColor.withOpacity(0.6),
                 ),
               ),
             ),
@@ -71,14 +81,20 @@ class InfoHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Warna sub-text header
+    Color subHeaderColor = Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white, // [DIHAPUS] Agar ikut tema main.dart
       appBar: AppBar(
         title: const Text(
           'Pusat Informasi BudayaPedia',
-          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            // color: darkTextColor // [DIHAPUS] Biarkan otomatis
+          ),
         ),
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white, // [DIHAPUS] Agar ikut tema
         elevation: 1,
       ),
       body: SingleChildScrollView(
@@ -86,26 +102,32 @@ class InfoHubPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Akses semua informasi yang Anda butuhkan tentang BudayaPedia di sini.',
-              style: TextStyle(fontSize: 14, color: lightTextColor),
+              style: TextStyle(fontSize: 14, color: subHeaderColor),
             ),
             const SizedBox(height: 30),
 
-            // --- 1. BANTUAN & FAQ (KONTEN LANGSUNG) ---
+            // --- 1. BANTUAN & FAQ ---
             _buildContentSection(
+              context, // Pass context
               'Bantuan & FAQ',
               _contentData['Bantuan & FAQ']!,
             ),
 
-            // --- 2. KEBIJAKAN PRIVASI (KONTEN LANGSUNG) ---
+            // --- 2. KEBIJAKAN PRIVASI ---
             _buildContentSection(
+              context, // Pass context
               'Kebijakan Privasi',
               _contentData['Kebijakan Privasi']!,
             ),
 
-            // --- 3. TENTANG KAMI (KONTEN LANGSUNG) ---
-            _buildContentSection('Tentang Kami', _contentData['Tentang Kami']!),
+            // --- 3. TENTANG KAMI ---
+            _buildContentSection(
+              context, // Pass context
+              'Tentang Kami',
+              _contentData['Tentang Kami']!,
+            ),
 
             const SizedBox(height: 20),
           ],

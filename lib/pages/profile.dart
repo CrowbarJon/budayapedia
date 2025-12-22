@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-// Import file navigasi
+// Import file navigasi (Sesuaikan path import Anda jika berbeda)
 import 'login.dart';
 import '/securityPage.dart';
 import '/learning_history_page.dart';
 import '/setting_pages.dart';
 import '/infoHub.dart';
 
-// Definisikan warna yang digunakan dalam desain Anda (Konsistensi)
-const Color primaryColor = Color(0xFF2C3E50); // Biru Tua (Aksen utama)
-const Color darkTextColor = Color(0xFF1E2A3B);
-const Color lightTextColor = Color(0xFF5A6B80);
-const Color accentColor = Color(0xFFFFA000); // Oranye (Aksen tombol/edit)
-const Color borderColor = Color(0xFFE0E0E0); // Warna Border
+// Definisikan warna aksen (Warna brand tetap sama)
+const Color primaryColor = Color(0xFF2C3E50); 
+const Color accentColor = Color(0xFFFFA000); 
+// const Color darkTextColor = Color(0xFF1E2A3B); // [DIHAPUS] Agar teks dinamis
+// const Color lightTextColor = Color(0xFF5A6B80); // [DIHAPUS] Agar teks dinamis
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -41,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
       String emailPrefix = user!.email!.split('@').first;
       return emailPrefix.isNotEmpty
           ? emailPrefix[0].toUpperCase() +
-                emailPrefix.substring(1).toLowerCase()
+              emailPrefix.substring(1).toLowerCase()
           : 'Pengguna';
     } else {
       return "Pengguna Budayapedia";
@@ -59,9 +58,9 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Gagal Logout: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal Logout: $e")),
+        );
       }
     }
   }
@@ -97,25 +96,18 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text(
                 'Foto Profil',
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: darkTextColor,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: darkTextColor),
-              title: const Text(
-                'Kamera',
-                style: TextStyle(color: darkTextColor),
-              ),
+              leading: Icon(Icons.camera_alt, color: Theme.of(context).iconTheme.color),
+              title: const Text('Kamera'),
               onTap: _pickImageFromCamera,
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: darkTextColor),
-              title: const Text(
-                'Galeri',
-                style: TextStyle(color: darkTextColor),
-              ),
+              leading: Icon(Icons.photo_library, color: Theme.of(context).iconTheme.color),
+              title: const Text('Galeri'),
               onTap: _pickImageFromGallery,
             ),
             const SizedBox(height: 10),
@@ -140,10 +132,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                "Batal",
-                style: TextStyle(color: lightTextColor),
-              ),
+              child: const Text("Batal"),
               onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
@@ -178,14 +167,14 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Gagal memperbarui nama: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal memperbarui nama: $e")),
+      );
     }
   }
   // --- END UTILITY FUNGSI ---
 
-  // WIDGET KARTU MENU INTERAKTIF YANG LEBIH CLEAN
+  // WIDGET KARTU MENU INTERAKTIF
   Widget _buildInteractiveCard({
     required BuildContext context,
     required IconData icon,
@@ -193,20 +182,23 @@ class _ProfilePageState extends State<ProfilePage> {
     required VoidCallback onTap,
     bool isLogout = false,
   }) {
-    // Warna untuk Ikon & Teks
+    // Warna teks otomatis mengikuti tema (Hitam di Light, Putih di Dark)
+    final Color textColor = isLogout 
+        ? Colors.red.shade700 
+        : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    
+    // Warna Icon
     final Color iconColor = isLogout ? Colors.red.shade700 : primaryColor;
-    final Color textColor = isLogout ? Colors.red.shade700 : darkTextColor;
+    
+    // Warna Divider
+    final Color dividerColor = Theme.of(context).dividerColor;
 
     return InkWell(
-      // Menggunakan InkWell untuk efek riak yang lebih baik (UI/UX)
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 18,
-          horizontal: 0,
-        ), // Padding horizontal 0 karena ada divider
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: borderColor, width: 1.0)),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 0),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: dividerColor, width: 1.0)),
         ),
         child: Row(
           children: [
@@ -218,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: textColor,
+                  color: textColor, // Menggunakan warna dinamis
                 ),
               ),
             ),
@@ -226,7 +218,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ? const SizedBox.shrink()
                 : Icon(
                     Icons.chevron_right,
-                    color: lightTextColor.withOpacity(0.8),
+                    // Icon panah warnanya agak transparan agar tidak terlalu mencolok
+                    color: Theme.of(context).iconTheme.color?.withOpacity(0.5) ?? Colors.grey,
                   ),
           ],
         ),
@@ -234,14 +227,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // WIDGET HEADER PROFIL (Pemusatan Informasi Akun)
+  // WIDGET HEADER PROFIL
   Widget _buildProfileHeader(String email, String photoUrl) {
+    // Cek apakah Dark Mode aktif
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.only(top: 30, bottom: 40),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: borderColor, width: 1.5)),
+        // Background Header: Putih di Light Mode, Abu Gelap di Dark Mode
+        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white, 
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1.5),
+        ),
       ),
       child: Column(
         children: [
@@ -267,7 +266,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       color: accentColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        // Border lingkaran edit: Ikut warna background header
+                        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white, 
+                        width: 2,
+                      ),
                     ),
                     child: const Icon(
                       Icons.edit,
@@ -286,18 +289,18 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 currentUsername,
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: darkTextColor,
-                ),
+                      fontWeight: FontWeight.bold,
+                      // Warna teks otomatis (tidak perlu hardcode darkTextColor)
+                    ),
               ),
               GestureDetector(
                 onTap: _editUsername,
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 8.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
                   child: Icon(
                     Icons.mode_edit_outline,
                     size: 18,
-                    color: lightTextColor,
+                    color: Theme.of(context).disabledColor,
                   ),
                 ),
               ),
@@ -306,7 +309,10 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 5),
           Text(
             email,
-            style: const TextStyle(fontSize: 14, color: lightTextColor),
+            style: TextStyle(
+              fontSize: 14, 
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            ),
           ),
         ],
       ),
@@ -319,15 +325,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final String photoUrl = user?.photoURL ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white, // [DIHAPUS] Biarkan Theme mengatur background
       appBar: AppBar(
         title: const Text(
           'Akun Saya',
-          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+          style: TextStyle(fontWeight: FontWeight.bold), // Warna otomatis
         ),
-        backgroundColor: Colors.white,
-        elevation:
-            0, // Hilangkan shadow AppBar untuk tampilan yang lebih bersih
+        // backgroundColor: Colors.white, // [DIHAPUS] Biarkan Theme mengatur
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -338,14 +343,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // --- 2. KELOMPOK MENU: AKTIVITAS & RIWAYAT ---
             const SizedBox(height: 20),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Aktivitas & Riwayat',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: lightTextColor,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 ),
               ),
             ),
@@ -366,14 +371,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // --- 3. KELOMPOK MENU: PENGATURAN & KEAMANAN ---
             const SizedBox(height: 20),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Pengaturan Akun',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: lightTextColor,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 ),
               ),
             ),
@@ -401,16 +406,16 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
 
-            // --- 4. PUSAT INFORMASI & DUKUNGAN (Tombol Tunggal) ---
+            // --- 4. PUSAT INFORMASI & DUKUNGAN ---
             const SizedBox(height: 20),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Dukungan & Informasi',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: lightTextColor,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 ),
               ),
             ),
@@ -427,7 +432,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
 
-            // --- 5. KELOMPOK MENU: LOGOUT ---
+            // --- 5. LOGOUT ---
             const SizedBox(height: 30),
             _buildInteractiveCard(
               context: context,

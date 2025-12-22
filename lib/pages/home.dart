@@ -45,20 +45,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  late final List<Widget> _pages = [
-    HomeContentWidget(
-      onNotificationsPressed: _navigateToNotifications,
-      onSettingsPressed: _showSideSettingsPanel,
-    ),
-    MyCoursePage(),
-    const Center(
-      child: Text(
-        'Halaman New (Add Box)',
-        style: TextStyle(fontSize: 24, color: darkTextColor),
+  // --- FUNGSI BARU: PINDAH KE TAB COURSES ---
+  void _navigateToCoursesTab() {
+    setState(() {
+      _currentIndex = 1; // 1 adalah index untuk Courses/MyCoursePage
+    });
+  }
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomeContentWidget(
+        onNotificationsPressed: _navigateToNotifications,
+        onSettingsPressed: _showSideSettingsPanel,
+        onViewAllPressed: _navigateToCoursesTab, // Masukkan fungsi pindah tab ke sini
       ),
-    ),
-    const ProfilePage(),
-  ];
+      MyCoursePage(),
+      const Center(
+        child: Text(
+          'Halaman New (Add Box)',
+          style: TextStyle(fontSize: 24, color: darkTextColor),
+        ),
+      ),
+      const ProfilePage(),
+    ];
+  }
 
   void onTabTapped(int index) {
     setState(() {
@@ -96,11 +110,13 @@ class _HomePageState extends State<HomePage> {
 class HomeContentWidget extends StatefulWidget {
   final VoidCallback onNotificationsPressed;
   final VoidCallback onSettingsPressed;
+  final VoidCallback onViewAllPressed; // Callback baru untuk tombol View All
 
   const HomeContentWidget({
     super.key,
     required this.onNotificationsPressed,
     required this.onSettingsPressed,
+    required this.onViewAllPressed, // Wajib diisi
   });
 
   @override
@@ -116,13 +132,11 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
     _loadCompletedCoursesCount();
   }
 
-  // FUNGSI UNTUK MENGHITUNG COURSE YANG DISELESAIKAN
   Future<void> _loadCompletedCoursesCount() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       int completedCount = 0;
 
-      // Loop semua course dan cek progress masing-masing
       for (var course in allCourses) {
         String progressKey = 'progress_${course.title}';
         String? savedData = prefs.getString(progressKey);
@@ -131,8 +145,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
           List<dynamic> decoded = jsonDecode(savedData);
           List<bool> moduleCompleted = decoded.map((e) => e as bool).toList();
 
-          // Cek apakah semua modul selesai (100%)
-          if (moduleCompleted.isNotEmpty && 
+          if (moduleCompleted.isNotEmpty &&
               moduleCompleted.every((completed) => completed)) {
             completedCount++;
           }
@@ -146,6 +159,22 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
       }
     } catch (e) {
       debugPrint('Error loading completed courses: $e');
+    }
+  }
+
+  // --- FUNGSI BARU: MENENTUKAN TOKOH ADAT ---
+  // Anda bisa mengedit nama tokoh di sini sesuai judul course
+  String _getInstructorName(String courseTitle) {
+    if (courseTitle.contains('Minang')) {
+      return 'Ibrahim Datuak Sangguno Dirajo';
+    } else if (courseTitle.contains('Keraton') || courseTitle.contains('Jawa')) {
+      return 'Nyi Raden Retno Dumilah'; // Ganti dengan nama tokoh Jawa
+    } else if (courseTitle.contains('Dayak')) {
+      return 'Panglima Burung'; // Ganti dengan nama tokoh Dayak
+    } else if (courseTitle.contains('Papeda') || courseTitle.contains('Papua')) {
+      return 'Mama Regina Krey'; // Ganti dengan nama tokoh Papua
+    } else {
+      return 'Instruktur Budaya'; // Default jika tidak ada yang cocok
     }
   }
 
@@ -179,6 +208,9 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
   }
 
   Widget _buildPopularCourseCard(BuildContext context, Course courseData) {
+    // Ambil nama instruktur berdasarkan judul course
+    String instructorName = _getInstructorName(courseData.title);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -208,16 +240,16 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                 Text(
                   courseData.title,
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: darkTextColor,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: darkTextColor,
+                      ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   courseData.description,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: lightTextColor,
-                  ),
+                        color: lightTextColor,
+                      ),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -238,9 +270,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                         ),
                         minimumSize: Size.zero,
                       ),
-                      child: const Text(
-                        'Ibrahim Datuak Sangguno Dirajo',
-                        style: TextStyle(fontSize: 14),
+                      // TAMPILKAN NAMA INSTRUKTUR DINAMIS
+                      child: Text(
+                        instructorName, 
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -260,9 +293,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Logic untuk menentukan Popular Course (bisa diganti sesuai kebutuhan)
     final Course popularCourse = allCourses.firstWhere(
-      (course) => course.title.contains("Rendang"),
-      orElse: () => allCourses[0],
+      (course) => course.title.contains("Rendang"), // Prioritas Rendang/Minang
+      orElse: () => allCourses[0], // Fallback ke course pertama
     );
 
     final user = FirebaseAuth.instance.currentUser;
@@ -274,7 +308,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
       String emailPrefix = user!.email!.split('@').first;
       username = emailPrefix.isNotEmpty
           ? emailPrefix[0].toUpperCase() +
-                emailPrefix.substring(1).toLowerCase()
+              emailPrefix.substring(1).toLowerCase()
           : 'Pengguna';
     } else {
       username = "Pengguna";
@@ -319,7 +353,9 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                           children: [
                             Text(
                               'Halo, $username!',
-                              style: Theme.of(context).textTheme.titleMedium!
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                             const Text(
@@ -331,7 +367,6 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                       ],
                     ),
                     const SizedBox(height: 5),
-                    // DIGANTI: Learning Hours -> Completed Courses
                     Row(
                       children: [
                         const Icon(
@@ -384,8 +419,8 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                 Text(
                   'Popular Sekarang',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {},
@@ -406,7 +441,7 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
             ),
           ),
 
-          // --- 3. Popular Course Card (Rendang) ---
+          // --- 3. Popular Course Card ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: GestureDetector(
@@ -432,11 +467,11 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                 Text(
                   'Kategori Course',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: widget.onViewAllPressed, // AKSI VIEW ALL DIHUBUNGKAN
                   child: const Text(
                     'View all',
                     style: TextStyle(
@@ -475,8 +510,6 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
           ),
 
           const SizedBox(height: 20),
-
-
         ],
       ),
     );

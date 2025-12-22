@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // BARU: Untuk Sign Out
-// BARU: Ganti dengan path ke halaman login/welcome Anda yang sebenarnya
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:budayapedia/pages/welcome.dart';
+// PENTING: Sesuaikan path import ini dengan lokasi file InfoHubPage kamu
+import '../infoHUB.dart';
 
-// Definisikan warna yang sama agar konsisten
 const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
 
-// PERUBAHAN 1: Mengubah StatelessWidget menjadi StatefulWidget
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({super.key});
 
@@ -16,7 +15,6 @@ class SettingsPanel extends StatefulWidget {
   State<SettingsPanel> createState() => _SettingsPanelState();
 }
 
-// PERUBAHAN 2: State Class baru untuk mengelola toggle
 class _SettingsPanelState extends State<SettingsPanel> {
   // State lokal untuk menyimpan status toggle
   bool _pushNotificationsEnabled = true;
@@ -45,7 +43,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
       ),
       trailing: Switch(
         value: value,
-        onChanged: onChanged, // Menerima fungsi onChanged dari luar
+        onChanged: onChanged,
         activeThumbColor: primaryColor,
         inactiveTrackColor: Colors.grey[300],
       ),
@@ -62,7 +60,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
   ) {
     return ListTile(
       leading: Icon(icon, color: color),
-      title: Text(title, style: TextStyle(color: darkTextColor)),
+      title: Text(title, style: const TextStyle(color: darkTextColor)),
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
       onTap: onTap,
     );
@@ -71,9 +69,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height:
-          MediaQuery.of(context).size.height *
-          0.75, // Mengambil 75% tinggi layar
+      height: MediaQuery.of(context).size.height * 0.75, // 75% tinggi layar
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -82,7 +78,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle untuk menutup panel
+          // Handle untuk menutup panel (garis kecil di atas)
           Center(
             child: Container(
               width: 40,
@@ -144,57 +140,51 @@ class _SettingsPanelState extends State<SettingsPanel> {
                 ),
                 const Divider(indent: 16, endIndent: 16, height: 1),
 
-                // === OPSI AKUN STANDAR (LIST TILE) ===
-                // Kebijakan Privasi (Dipertahankan)
+                // === OPSI PUSAT INFORMASI (DIGABUNG) ===
+                // Ini menggantikan menu Kebijakan Privasi & Pusat Bantuan yang lama
                 _buildSettingsTile(
                   context,
-                  Icons.privacy_tip_outlined,
-                  'Kebijakan Privasi',
+                  Icons.info_outline, // Ikon 'i' (Informasi)
+                  'Pusat Informasi & Bantuan', // Judul baru yang digabung
                   primaryColor,
                   () {
-                    // Navigasi ke halaman detail Privasi
-                    // Contoh: Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()));
-                    print('Navigasi ke Kebijakan Privasi');
-                  },
-                ),
-                // Pusat Bantuan (Dipertahankan)
-                _buildSettingsTile(
-                  context,
-                  Icons.help_outline,
-                  'Pusat Bantuan',
-                  primaryColor,
-                  () {
-                    // Navigasi ke halaman Bantuan
-                    // Contoh: Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpCenterPage()));
-                    print('Navigasi ke Pusat Bantuan');
+                    // 1. Tutup panel setting (bottom sheet)
+                    Navigator.pop(context);
+
+                    // 2. Buka halaman InfoHubPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InfoHubPage(),
+                      ),
+                    );
                   },
                 ),
 
-                // === LOGOUT (LIST TILE) - FULL IMPLEMENTASI ===
+                // === LOGOUT ===
                 _buildSettingsTile(
                   context,
                   Icons.logout,
                   'Logout',
                   Colors.red,
                   () async {
-                    Navigator.pop(context); // 1. Tutup panel settings
+                    Navigator.pop(context); // Tutup panel
 
                     try {
-                      // 2. Lakukan sign out Firebase
                       await FirebaseAuth.instance.signOut();
 
-                      // 3. Navigasi ke halaman awal (WelcomePage) dan HAPUS semua rute sebelumnya
-                      // Ganti WelcomePage() dengan nama Widget halaman login Anda yang sebenarnya
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const WelcomePage(),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
+                      // Navigasi ke halaman Welcome dan hapus history route
+                      if (context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WelcomePage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      }
                     } catch (e) {
                       print("Error saat sign out: $e");
-                      // Anda bisa menampilkan pesan error kepada pengguna di sini
                     }
                   },
                 ),

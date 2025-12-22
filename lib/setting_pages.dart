@@ -1,10 +1,8 @@
-// settings_page.dart (Pengaturan Aplikasi - Tanpa Slider Ukuran Teks & Pilihan Bahasa Interaktif)
-
 import 'package:flutter/material.dart';
+import 'package:budayapedia/main.dart'; // [PENTING] Import ini agar tombol tersambung ke main.dart
 
-// Definisikan warna yang digunakan (Konsisten)
+// Definisikan warna yang digunakan
 const Color primaryColor = Color(0xFF2C3E50);
-const Color darkTextColor = Color(0xFF1E2A3B);
 const Color lightTextColor = Color(0xFF5A6B80);
 const Color accentColor = Color(0xFFFFCC33);
 
@@ -16,15 +14,14 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // State Simulasi
-  bool _isDarkModeEnabled = false;
+  // State Notifikasi
   bool _isStreakNotificationEnabled = true;
-  String _currentLanguage = 'Bahasa Indonesia'; // State untuk Bahasa
+  String _currentLanguage = 'Bahasa Indonesia';
 
   // Nilai Cache Simulasi
   String _cacheSize = '56.8 MB';
 
-  // Fungsi untuk membersihkan Cache (Simulasi Aksi)
+  // Fungsi untuk membersihkan Cache
   void _clearCache() {
     showDialog(
       context: context,
@@ -56,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // Fungsi untuk mengubah Bahasa (Interaktif)
+  // Fungsi untuk mengubah Bahasa
   void _changeLanguage() {
     showDialog(
       context: context,
@@ -69,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ListTile(
                 title: const Text('Bahasa Indonesia'),
                 trailing: _currentLanguage == 'Bahasa Indonesia'
-                    ? Icon(Icons.check_circle, color: primaryColor)
+                    ? const Icon(Icons.check_circle, color: primaryColor)
                     : null,
                 onTap: () {
                   setState(() {
@@ -81,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ListTile(
                 title: const Text('English'),
                 trailing: _currentLanguage == 'English'
-                    ? Icon(Icons.check_circle, color: primaryColor)
+                    ? const Icon(Icons.check_circle, color: primaryColor)
                     : null,
                 onTap: () {
                   setState(() {
@@ -95,7 +92,6 @@ class _SettingsPageState extends State<SettingsPage> {
         );
       },
     ).then((_) {
-      // Tampilkan Snackbar setelah dialog tertutup
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Bahasa diubah menjadi $_currentLanguage")),
@@ -104,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  // Widget untuk Opsi Toggle (Sakelar)
+  // Widget Toggle Option
   Widget _buildToggleOption(
     String title,
     String subtitle,
@@ -118,7 +114,6 @@ class _SettingsPageState extends State<SettingsPage> {
         title,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
-          color: darkTextColor,
         ),
       ),
       subtitle: Text(
@@ -130,11 +125,11 @@ class _SettingsPageState extends State<SettingsPage> {
         onChanged: onChanged,
         activeThumbColor: accentColor,
       ),
-      onTap: () => onChanged(!value), // Membuat seluruh list dapat ditekan
+      onTap: () => onChanged(!value),
     );
   }
 
-  // Widget untuk Opsi Aksi (Tombol/Navigasi)
+  // Widget Action Option
   Widget _buildActionOption(
     String title,
     String trailingText,
@@ -147,7 +142,6 @@ class _SettingsPageState extends State<SettingsPage> {
         title,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
-          color: darkTextColor,
         ),
       ),
       trailing: Row(
@@ -163,21 +157,24 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Cek apakah Dark Mode sedang aktif berdasarkan themeNotifier dari main.dart
+    bool isDarkMode = themeNotifier.value == ThemeMode.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Pengaturan Aplikasi',
-          style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.white,
         elevation: 1,
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // --- 1. KELOMPOK PERSONALIASI UI ---
+            // --- 1. KELOMPOK PERSONALISASI UI ---
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 20, 16, 10),
               child: Text(
@@ -190,24 +187,26 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
 
+            // [BAGIAN YANG SUDAH DIPERBAIKI]
             _buildToggleOption(
               'Mode Gelap',
               'Mengubah latar belakang menjadi gelap (beta)',
               Icons.dark_mode_outlined,
-              _isDarkModeEnabled,
+              isDarkMode, // Menggunakan nilai dari main.dart
               (newValue) {
-                setState(() {
-                  _isDarkModeEnabled = newValue;
-                });
+                // 1. Mengubah tema aplikasi secara global
+                themeNotifier.value = newValue ? ThemeMode.dark : ThemeMode.light;
+                
+                // 2. [WAJIB] Refresh UI SettingsPage agar tombol switch bergeser
+                setState(() {}); 
               },
             ),
 
-            // Opsi Ukuran Teks Dihapus
             _buildActionOption(
               'Bahasa Aplikasi',
-              _currentLanguage, // Menampilkan bahasa yang dipilih
+              _currentLanguage,
               Icons.language,
-              _changeLanguage, // Memanggil fungsi ganti bahasa
+              _changeLanguage,
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
 

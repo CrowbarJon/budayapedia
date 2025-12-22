@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-// import 'package:budayapedia/pages/welcome.dart'; // Jika tidak dipakai, boleh dihapus
 import 'package:budayapedia/pages/home.dart';
 import 'package:budayapedia/pages/signup.dart';
 import 'package:budayapedia/pages/lupa_password.dart'; // <<< IMPORT BARU DITAMBAHKAN
