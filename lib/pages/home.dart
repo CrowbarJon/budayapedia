@@ -1,3 +1,4 @@
+// lib/pages/home.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +11,8 @@ import 'setting_panel.dart';
 import 'notifikasi.dart';
 import 'profile.dart';
 import 'course_model.dart';
+// PASTIKAN IMPORT INI SESUAI DENGAN LOKASI FILE ANDA
+import '../add_course/add_course.dart'; 
 
 // Definisikan warna yang digunakan dalam desain Anda
 const Color primaryColor = Color(0xFF2C3E50);
@@ -61,15 +64,11 @@ class _HomePageState extends State<HomePage> {
       HomeContentWidget(
         onNotificationsPressed: _navigateToNotifications,
         onSettingsPressed: _showSideSettingsPanel,
-        onViewAllPressed: _navigateToCoursesTab, // Masukkan fungsi pindah tab ke sini
+        onViewAllPressed: _navigateToCoursesTab, 
       ),
       MyCoursePage(),
-      const Center(
-        child: Text(
-          'Halaman New (Add Box)',
-          style: TextStyle(fontSize: 24, color: darkTextColor),
-        ),
-      ),
+      // [PERUBAHAN DI SINI] Mengganti Text placeholder dengan Halaman AddCoursePage
+      const AddCoursePage(), 
       const ProfilePage(),
     ];
   }
@@ -83,7 +82,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      // Menggunakan IndexedStack agar state halaman tidak hilang saat pindah tab (opsional, tapi disarankan)
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primaryColor,
@@ -95,7 +98,8 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.article), label: 'Courses'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'New'),
+          // Ikon "New" sekarang akan membuka AddCoursePage
+          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'New'), 
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
       ),
@@ -110,13 +114,13 @@ class _HomePageState extends State<HomePage> {
 class HomeContentWidget extends StatefulWidget {
   final VoidCallback onNotificationsPressed;
   final VoidCallback onSettingsPressed;
-  final VoidCallback onViewAllPressed; // Callback baru untuk tombol View All
+  final VoidCallback onViewAllPressed; 
 
   const HomeContentWidget({
     super.key,
     required this.onNotificationsPressed,
     required this.onSettingsPressed,
-    required this.onViewAllPressed, // Wajib diisi
+    required this.onViewAllPressed,
   });
 
   @override
@@ -162,19 +166,17 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
     }
   }
 
-  // --- FUNGSI BARU: MENENTUKAN TOKOH ADAT ---
-  // Anda bisa mengedit nama tokoh di sini sesuai judul course
   String _getInstructorName(String courseTitle) {
     if (courseTitle.contains('Minang')) {
       return 'Ibrahim Datuak Sangguno Dirajo';
     } else if (courseTitle.contains('Keraton') || courseTitle.contains('Jawa')) {
-      return 'Nyi Raden Retno Dumilah'; // Ganti dengan nama tokoh Jawa
+      return 'Nyi Raden Retno Dumilah'; 
     } else if (courseTitle.contains('Dayak')) {
-      return 'Panglima Burung'; // Ganti dengan nama tokoh Dayak
+      return 'Panglima Burung'; 
     } else if (courseTitle.contains('Papeda') || courseTitle.contains('Papua')) {
-      return 'Mama Regina Krey'; // Ganti dengan nama tokoh Papua
+      return 'Mama Regina Krey'; 
     } else {
-      return 'Instruktur Budaya'; // Default jika tidak ada yang cocok
+      return 'Instruktur Budaya'; 
     }
   }
 
@@ -208,7 +210,6 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
   }
 
   Widget _buildPopularCourseCard(BuildContext context, Course courseData) {
-    // Ambil nama instruktur berdasarkan judul course
     String instructorName = _getInstructorName(courseData.title);
 
     return Card(
@@ -270,7 +271,6 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
                         ),
                         minimumSize: Size.zero,
                       ),
-                      // TAMPILKAN NAMA INSTRUKTUR DINAMIS
                       child: Text(
                         instructorName, 
                         style: const TextStyle(fontSize: 14),
@@ -293,10 +293,10 @@ class _HomeContentWidgetState extends State<HomeContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Logic untuk menentukan Popular Course (bisa diganti sesuai kebutuhan)
+    // Logic untuk menentukan Popular Course
     final Course popularCourse = allCourses.firstWhere(
-      (course) => course.title.contains("Rendang"), // Prioritas Rendang/Minang
-      orElse: () => allCourses[0], // Fallback ke course pertama
+      (course) => course.title.contains("Rendang") || course.title.contains("Minang"), 
+      orElse: () => allCourses[0], 
     );
 
     final user = FirebaseAuth.instance.currentUser;

@@ -1,8 +1,8 @@
 // lib/pages/courseview.dart
 
 import 'package:flutter/material.dart';
-import 'course_model.dart'; // Menggunakan Model Course yang tunggal
-import 'learningPages.dart'; // Import Halaman Pembelajaran
+import 'course_model.dart'; 
+import 'LearningPages.dart'; // Pastikan nama file ini sesuai (learningPages.dart atau learning_page.dart)
 
 const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);
@@ -13,6 +13,21 @@ class CourseDetailsView extends StatelessWidget {
   final Course course;
 
   const CourseDetailsView({super.key, required this.course});
+
+  // --- FUNGSI BARU: MENENTUKAN TOKOH ADAT ---
+  String _getInstructorName(String courseTitle) {
+    if (courseTitle.contains('Minang')) {
+      return 'Ibrahim Datuak Sangguno Dirajo';
+    } else if (courseTitle.contains('Keraton') || courseTitle.contains('Jawa')) {
+      return 'Nyi Raden Retno Dumilah'; 
+    } else if (courseTitle.contains('Dayak')) {
+      return 'Panglima Burung'; 
+    } else if (courseTitle.contains('Papeda') || courseTitle.contains('Papua')) {
+      return 'Mama Regina Krey'; 
+    } else {
+      return 'Instruktur Budaya'; 
+    }
+  }
 
   Widget _buildCoursePoint(String text) {
     return Padding(
@@ -73,6 +88,7 @@ class CourseDetailsView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Gambar Course
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ClipRRect(
@@ -92,11 +108,13 @@ class CourseDetailsView extends StatelessWidget {
                 ),
               ),
             ),
+            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Badge Kategori
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -116,6 +134,8 @@ class CourseDetailsView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  
+                  // Judul Course
                   Text(
                     course.title,
                     style: const TextStyle(
@@ -126,17 +146,21 @@ class CourseDetailsView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  
+                  // Nama Instruktur (SUDAH DINAMIS)
                   Row(
                     children: [
                       const Icon(Icons.person, size: 18, color: lightTextColor),
                       const SizedBox(width: 4),
-                      const Text(
-                        'Ibrahim Datuak Sangguno Dirajo',
-                        style: TextStyle(fontSize: 14, color: lightTextColor),
+                      Text(
+                        _getInstructorName(course.title), // <-- Panggil Fungsi Disini
+                        style: const TextStyle(fontSize: 14, color: lightTextColor),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
+                  
+                  // Deskripsi
                   Text(
                     course.description,
                     style: const TextStyle(
@@ -146,6 +170,8 @@ class CourseDetailsView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  
+                  // List Isi Course
                   const Text(
                     'Isi Course:',
                     style: TextStyle(
@@ -163,6 +189,8 @@ class CourseDetailsView extends StatelessWidget {
           ],
         ),
       ),
+      
+      // Tombol Start Course
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
         width: double.infinity,

@@ -174,7 +174,7 @@ class _MyCoursePageState extends State<MyCoursePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Course',
+          'Semua Course',
           style: TextStyle(fontWeight: FontWeight.bold, color: darkTextColor),
         ),
         backgroundColor: Colors.white,
