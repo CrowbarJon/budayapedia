@@ -1,4 +1,4 @@
-// lib/pages/learning_page.dart - INTERACTIVE MICRO-LEARNING VERSION
+// lib/pages/learning_page.dart - FINAL VERSION
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -82,6 +82,30 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
     }
   }
 
+  // --- LOGIKA MENYIMPAN RIWAYAT (HISTORY) ---
+  Future<void> _markCourseAsFinished() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 1. Ambil daftar kursus yang sudah selesai
+      List<String> finishedCourses = prefs.getStringList('completed_courses') ?? [];
+      
+      // 2. Cek apakah kursus ini sudah ada? Jika belum, tambahkan.
+      if (!finishedCourses.contains(widget.course.title)) {
+        finishedCourses.add(widget.course.title);
+        await prefs.setStringList('completed_courses', finishedCourses);
+        
+        // 3. Tambah Jam Belajar (Simulasi +5 jam per course)
+        int currentHours = prefs.getInt('total_study_hours') ?? 0;
+        await prefs.setInt('total_study_hours', currentHours + 5);
+        
+        debugPrint("Course ${widget.course.title} marked as finished!");
+      }
+    } catch (e) {
+      debugPrint("Error marking course as finished: $e");
+    }
+  }
+
   @override
   void dispose() {
     _segmentController.dispose();
@@ -98,7 +122,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
     return [];
   }
 
-  // Struktur Sidebar Dinamis untuk 4 Kursus
+  // Struktur Sidebar Dinamis yang SUDAH DIPERBAIKI (Dayak & Papeda)
   List<Map<String, dynamic>> get sidebarSections {
     String title = widget.course.title;
 
@@ -123,17 +147,19 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
         {'title': 'FINAL EXAM', 'start_index': 11, 'end_index': 11},
       ];
     } else if (title.contains('Suku Dayak')) {
+      // PERBAIKAN: Index disesuaikan agar Quiz ada di index 5
       return [
-        {'title': 'PENGENALAN', 'start_index': 0, 'end_index': 2},
-        {'title': 'QUIZ TENGAH', 'start_index': 3, 'end_index': 3},
-        {'title': 'PENDALAMAN', 'start_index': 4, 'end_index': courseModules.length - 2},
+        {'title': 'MATERI DASAR', 'start_index': 0, 'end_index': 4}, 
+        {'title': 'QUIZ TENGAH', 'start_index': 5, 'end_index': 5},
+        {'title': 'PENDALAMAN', 'start_index': 6, 'end_index': courseModules.length - 2},
         {'title': 'UJIAN AKHIR', 'start_index': courseModules.length - 1, 'end_index': courseModules.length - 1},
       ];
     } else if (title.contains('Papeda')) {
+      // PERBAIKAN: Index disesuaikan agar Quiz ada di index 5
       return [
-        {'title': 'PENGENALAN', 'start_index': 0, 'end_index': 2},
-        {'title': 'QUIZ MASAK', 'start_index': 3, 'end_index': 3},
-        {'title': 'RESEP & TEKNIK', 'start_index': 4, 'end_index': courseModules.length - 2},
+        {'title': 'RESEP & TEKNIK', 'start_index': 0, 'end_index': 4},
+        {'title': 'QUIZ MASAK', 'start_index': 5, 'end_index': 5},
+        {'title': 'ETIKA MAKAN', 'start_index': 6, 'end_index': courseModules.length - 2},
         {'title': 'UJIAN AKHIR', 'start_index': courseModules.length - 1, 'end_index': courseModules.length - 1},
       ];
     }
@@ -141,7 +167,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
   }
 
   String? _getModuleImage(int index) {
-    // Gambar spesifik hanya untuk Minangkabau (sesuai aset yang ada)
     if (!widget.course.title.contains('Minangkabau')) return null;
     
     switch (index) {
@@ -193,7 +218,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
               ),
               child: Stack(
                 children: [
-                  // FRONT SIDE
                   if (!showBack)
                     Center(
                       child: Column(
@@ -213,15 +237,11 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                           const SizedBox(height: 8),
                           const Text(
                             'Tap untuk flip',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: lightTextColor,
-                            ),
+                            style: TextStyle(fontSize: 12, color: lightTextColor),
                           ),
                         ],
                       ),
                     ),
-                  // BACK SIDE
                   if (showBack)
                     Transform(
                       alignment: Alignment.center,
@@ -243,15 +263,10 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                         ),
                       ),
                     ),
-                  // FLIP INDICATOR
                   Positioned(
                     top: 12,
                     right: 12,
-                    child: Icon(
-                      Icons.sync,
-                      color: lightTextColor.withOpacity(0.5),
-                      size: 20,
-                    ),
+                    child: Icon(Icons.sync, color: lightTextColor.withOpacity(0.5), size: 20),
                   ),
                 ],
               ),
@@ -284,10 +299,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
             ),
             labelColor: Colors.white,
             unselectedLabelColor: darkTextColor,
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             tabs: const [
               Tab(text: 'KONSEP'),
               Tab(text: 'ANALISIS'),
@@ -319,10 +331,8 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
         'aplikasi': [paragraphs.last],
       };
     }
-
     int konsepEnd = (total * 0.3).ceil().clamp(1, total);
     int analisisEnd = (total * 0.7).ceil().clamp(konsepEnd, total);
-
     return {
       'konsep': paragraphs.sublist(0, konsepEnd),
       'analisis': paragraphs.sublist(konsepEnd, analisisEnd),
@@ -337,7 +347,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
         children: content.asMap().entries.map((entry) {
           int cardIndex = segmentIndex * 100 + entry.key;
           String paragraph = entry.value;
-          
           String title = paragraph.split('.').first;
           if (title.length > 50) title = '${title.substring(0, 50)}...';
 
@@ -391,10 +400,8 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
               const Text(
                 'STUDI KASUS',
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: accentColor,
-                  letterSpacing: 1.2,
+                  fontSize: 12, fontWeight: FontWeight.bold,
+                  color: accentColor, letterSpacing: 1.2,
                 ),
               ),
             ],
@@ -402,20 +409,12 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
           const SizedBox(height: 12),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: darkTextColor,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkTextColor),
           ),
           const SizedBox(height: 8),
           Text(
             description,
-            style: TextStyle(
-              fontSize: 14,
-              color: darkTextColor.withOpacity(0.8),
-              height: 1.5,
-            ),
+            style: TextStyle(fontSize: 14, color: darkTextColor.withOpacity(0.8), height: 1.5),
           ),
         ],
       ),
@@ -426,7 +425,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
     if (courseModules.isEmpty) {
       return const Drawer(width: 300, child: Center(child: Text("Tidak ada modul")));
     }
-
     double progress = _moduleCompleted.where((c) => c).length / courseModules.length;
 
     return Drawer(
@@ -450,14 +448,9 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
               const SizedBox(height: 6),
               Text(
                 '${(progress * 100).toInt()}% SELESAI',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: primaryColor,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryColor),
               ),
               const Divider(height: 30, thickness: 1),
-
               ...sidebarSections.map((section) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -466,12 +459,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                       padding: const EdgeInsets.only(top: 12, bottom: 6),
                       child: Text(
                         section['title'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                          color: darkTextColor,
-                          letterSpacing: 1,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: darkTextColor, letterSpacing: 1),
                       ),
                     ),
                     for (int i = section['start_index']; i <= section['end_index']; i++)
@@ -511,9 +499,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
             fontSize: 13,
           ),
         ),
-        trailing: isCompleted
-          ? const Icon(Icons.check_circle, color: correctColor, size: 18)
-          : null,
+        trailing: isCompleted ? const Icon(Icons.check_circle, color: correctColor, size: 18) : null,
         onTap: () {
           setState(() {
             _activeModuleIndex = index;
@@ -535,21 +521,13 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
           const SizedBox(height: 24),
           const Text(
             'Siap Uji Pemahaman?',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: darkTextColor,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: darkTextColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           const Text(
             'Kuis ini menguji pemahaman Anda tentang materi yang telah dipelajari.',
-            style: TextStyle(
-              fontSize: 16,
-              color: lightTextColor,
-              height: 1.6,
-            ),
+            style: TextStyle(fontSize: 16, color: lightTextColor, height: 1.6),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -566,7 +544,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
           QuizData? quiz;
           String courseTitle = widget.course.title;
 
-          // LOGIKA MAPPING KUIS (Untuk 4 Kursus)
           if (courseTitle.contains('Minangkabau')) {
             quiz = activeItem.title.contains('Final') ? minangkabauQuizFinal : minangkabauQuiz1;
           } else if (courseTitle.contains('Tari Klasik Keraton')) {
@@ -589,6 +566,8 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                 if (_activeModuleIndex < total - 1) {
                   _activeModuleIndex++;
                 } else {
+                  // --- FIX: Jika Kuis Terakhir lulus, tandai course selesai ---
+                  _markCourseAsFinished(); 
                   Navigator.popUntil(context, (route) => route.isFirst);
                 }
               });
@@ -610,13 +589,15 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
 
     // Tombol Lanjut / Selesai (Untuk Modul Materi)
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         setState(() {
           _moduleCompleted[_activeModuleIndex] = true;
           if (_activeModuleIndex < total - 1) {
             _activeModuleIndex++;
             _segmentController.animateTo(0);
           } else {
+            // --- FIX: Jika Materi Terakhir selesai, tandai course selesai ---
+            _markCourseAsFinished();
             Navigator.popUntil(context, (route) => route.isFirst);
           }
         });
@@ -648,7 +629,6 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
     if (_activeModuleIndex >= courseModules.length) {
       return const Center(child: Text('Konten tidak tersedia'));
     }
-
     final activeItem = courseModules[_activeModuleIndex];
     int lessonNum = _activeModuleIndex + 1;
     int total = courseModules.length;
@@ -671,11 +651,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
               Flexible(
                 child: Text(
                   activeItem.contentTitle,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
-                    color: darkTextColor,
-                  ),
+                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: darkTextColor),
                 ),
               ),
               Container(
@@ -686,17 +662,12 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                 ),
                 child: Text(
                   '$lessonNum/$total',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: accentColor,
-                  ),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: accentColor),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-
           if (imageUrl != null) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -706,15 +677,13 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  height: 200,
-                  color: cardBg,
+                  height: 200, color: cardBg,
                   child: const Icon(Icons.image, size: 60, color: lightTextColor),
                 ),
               ),
             ),
             const SizedBox(height: 20),
           ],
-
           if (paragraphs.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(20),
@@ -725,25 +694,13 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
               ),
               child: Text(
                 paragraphs.first,
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.7,
-                  color: darkTextColor,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: const TextStyle(fontSize: 16, height: 1.7, color: darkTextColor, fontWeight: FontWeight.w500),
               ),
             ),
           const SizedBox(height: 20),
-
-          _buildCaseStudyCard(
-            'Konsep Utama',
-            'Pahami konsep ini sebelum melanjutkan ke analisis yang lebih dalam pada tab berikutnya.',
-          ),
-
+          _buildCaseStudyCard('Konsep Utama', 'Pahami konsep ini sebelum melanjutkan ke analisis yang lebih dalam pada tab berikutnya.'),
           _buildSegmentedTabs(paragraphs),
-
           const SizedBox(height: 20),
-
           _buildNavButton(activeItem, total),
         ],
       ),
@@ -757,11 +714,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
       appBar: AppBar(
         title: Text(
           widget.course.title,
-          style: const TextStyle(
-            color: darkTextColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 17,
-          ),
+          style: const TextStyle(color: darkTextColor, fontWeight: FontWeight.bold, fontSize: 17),
         ),
         centerTitle: false,
         backgroundColor: Colors.white,
@@ -769,13 +722,7 @@ class _LearningPageState extends State<LearningPage> with TickerProviderStateMix
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'EXIT',
-              style: TextStyle(
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: const Text('EXIT', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

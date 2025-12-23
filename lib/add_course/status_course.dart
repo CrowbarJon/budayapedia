@@ -1,15 +1,17 @@
-// lib/add_course/status_course.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Pastikan import file halaman lain sesuai dengan struktur folder Anda
+
+// --- IMPORT HALAMAN LAIN ---
 import 'form_course.dart';
 import 'draft_course.dart';
+// Pastikan nama file ini sesuai dengan file detail page kamu
+import 'my_course_detail_page.dart'; 
 
 // --- DEFINISI WARNA ---
 const Color darkTextColor = Color(0xFF333333);
 const Color lightTextColor = Color(0xFF999999);
-const Color cardBackgroundColor = Color(0xFFF9F5FF); // Background Ungu Muda
+const Color cardBackgroundColor = Color(0xFFF9F5FF);
 
 class CourseStatusPage extends StatefulWidget {
   const CourseStatusPage({Key? key}) : super(key: key);
@@ -19,14 +21,11 @@ class CourseStatusPage extends StatefulWidget {
 }
 
 class _CourseStatusPageState extends State<CourseStatusPage> {
-  // Ambil User ID yang sedang login
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  // Helper untuk format tanggal
   String _formatDate(Timestamp? timestamp) {
     if (timestamp == null) return '-';
     DateTime date = timestamp.toDate();
-    // Format sederhana: DD/MM/YYYY
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
@@ -69,7 +68,6 @@ class _CourseStatusPageState extends State<CourseStatusPage> {
               stream: FirebaseFirestore.instance
                   .collection('courses')
                   .where('authorId', isEqualTo: userId)
-                  // .orderBy('createdAt', descending: true) // Aktifkan jika sudah buat index di Firebase
                   .snapshots(),
               builder: (context, snapshot) {
                 // 1. Loading State
@@ -105,6 +103,9 @@ class _CourseStatusPageState extends State<CourseStatusPage> {
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
+                    // Ambil ID dokumen jika nanti butuh update/delete
+                    final docId = docs[index].id; 
+                    
                     String statusString = data['status'] ?? 'pending';
 
                     // --- LOGIC TAMPILAN STATUS ---
@@ -124,134 +125,146 @@ class _CourseStatusPageState extends State<CourseStatusPage> {
                       statusIcon = Icons.cancel_outlined;
                       statusLabel = 'Ditolak';
                     } else {
-                      // Default: Pending
                       statusColor = Colors.orange;
-                      badgeBgColor = const Color(0xFFFFF4E5); // Oranye muda
+                      badgeBgColor = const Color(0xFFFFF4E5);
                       statusIcon = Icons.access_time_filled;
                       statusLabel = 'Pending';
                     }
 
-                    // --- CARD UI ---
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: cardBackgroundColor, // Warna background Ungu Muda
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // A. GAMBAR THUMBNAIL (Kiri)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty
-                                ? Image.network(
-                                    data['imageUrl'],
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        Container(
-                                          width: 80, 
-                                          height: 80, 
-                                          color: Colors.grey[300], 
-                                          child: const Icon(Icons.broken_image, color: Colors.grey)
-                                        ),
-                                  )
-                                : Container(
-                                    width: 80,
-                                    height: 80,
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.image, color: Colors.grey),
-                                  ),
-                          ),
-                          const SizedBox(width: 12),
+                    // --- WRAPPER INKWELL (LOGIKA KLIK DI SINI) ---
+                    return InkWell(
+                      onTap: () {
+                        // HANYA BISA DIKLIK JIKA STATUS APPROVED
+                        if (statusString == 'approved') {
+                          
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              // Kirim data course ke halaman detail
+                              builder: (context) => MyCourseDetailPage(
+                                courseData: data, 
+                                courseId: docId
+                              ), 
+                            ),
+                          );
 
-                          // B. KONTEN TEKS (Kanan)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // 1. Judul Course
-                                Text(
-                                  data['title'] ?? 'Tanpa Judul',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: darkTextColor,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 6),
-
-                                // 2. Deskripsi (Multi-line)
-                                Text(
-                                  data['description'] ?? 'Tidak ada deskripsi tersedia.',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                    height: 1.3, // Jarak antar baris
-                                  ),
-                                  maxLines: 3, // Mengizinkan 3 baris ke bawah
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-
-                                const SizedBox(height: 12),
-
-                                // 3. Footer: Tanggal & Status Badge
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Tanggal Upload
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.calendar_today_outlined, size: 12, color: lightTextColor),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          _formatDate(data['createdAt']),
-                                          style: const TextStyle(fontSize: 10, color: lightTextColor),
-                                        ),
-                                      ],
+                        } else {
+                          // TAMPILKAN SNACKBAR JIKA BELUM APPROVED
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Course ini masih '$statusLabel', belum bisa dibuka."),
+                              backgroundColor: Colors.orange,
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: cardBackgroundColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // A. GAMBAR THUMBNAIL
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty
+                                  ? Image.network(
+                                      data['imageUrl'],
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Container(
+                                            width: 80, height: 80, color: Colors.grey[300],
+                                            child: const Icon(Icons.broken_image, color: Colors.grey)
+                                          ),
+                                    )
+                                  : Container(
+                                      width: 80, height: 80, color: Colors.grey[300],
+                                      child: const Icon(Icons.image, color: Colors.grey),
                                     ),
+                            ),
+                            const SizedBox(width: 12),
 
-                                    // Badge Status
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: badgeBgColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(color: statusColor.withOpacity(0.3)),
-                                      ),
-                                      child: Row(
+                            // B. KONTEN TEKS
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data['title'] ?? 'Tanpa Judul',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: darkTextColor,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    data['description'] ?? 'Tidak ada deskripsi.',
+                                    style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.3),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Footer
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
                                         children: [
-                                          Icon(statusIcon, size: 10, color: statusColor),
+                                          const Icon(Icons.calendar_today_outlined, size: 12, color: lightTextColor),
                                           const SizedBox(width: 4),
                                           Text(
-                                            statusLabel,
-                                            style: TextStyle(
-                                              color: statusColor,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 10,
-                                            ),
+                                            _formatDate(data['createdAt']),
+                                            style: const TextStyle(fontSize: 10, color: lightTextColor),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: badgeBgColor,
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(color: statusColor.withOpacity(0.3)),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(statusIcon, size: 10, color: statusColor),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              statusLabel,
+                                              style: TextStyle(
+                                                color: statusColor,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
                 );
               },
             ),
-          );
-        }
-        }
+    );
+  }
+}

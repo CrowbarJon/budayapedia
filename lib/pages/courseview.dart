@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'course_model.dart'; 
-import 'LearningPages.dart'; // Pastikan nama file ini sesuai (learningPages.dart atau learning_page.dart)
+import 'LearningPages.dart'; 
 
 const Color primaryColor = Color(0xFF2C3E50);
 const Color darkTextColor = Color(0xFF1E2A3B);

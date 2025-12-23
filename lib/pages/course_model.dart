@@ -2,35 +2,38 @@
 // ISI FILE: lib/pages/course_model.dart
 // =======================================================
 import 'package:flutter/material.dart';
-import 'dart:io'; // Penting untuk menangani File thumbnail
+import 'dart:io'; 
 
-// Definisikan warna di sini agar bisa digunakan di data
 const Color primaryColor = Color(0xFF2C3E50);
 
 // ==========================================
-// 1. MODEL SEDERHANA (UNTUK TAMPILAN KATALOG)
+// 1. MODEL SEDERHANA (Simple Course)
 // ==========================================
 class Course {
   final String title;
   final String category;
   final String description;
-  final List<String> contents;
+  
+  final List<dynamic> contents; 
+  
   final String videoCount;
   final String duration;
   final String imageUrl;
+  final String status;
 
   Course({
     required this.title,
-    required this.category,
-    required this.description,
-    required this.contents,
-    required this.videoCount,
-    required this.duration,
+    this.category = 'Umum',     
+    this.description = '',      
+    this.contents = const [],   // Default kosong
+    this.videoCount = '0',      
+    this.duration = '0m',       
     required this.imageUrl,
+    this.status = 'approved',   
   });
 }
 
-// Data Dummy Katalog (Tetap ada agar halaman Home tidak error)
+// Data Dummy Katalog LAMA (Masih tersimpan aman disini)
 final List<Course> allCourses = [
   Course(
     title: "Filosofi Adat dan Rumah Gadang Minangkabau",
@@ -39,59 +42,47 @@ final List<Course> allCourses = [
     videoCount: '18 videos',
     duration: "2h 20m",
     imageUrl: 'assets/sumatra.jpg',
+    status: 'approved',
     contents: [
       "Memahami struktur sosial matrilineal Suku Minangkabau.",
-      "Menjelaskan peran penting Bundo Kanduang dan Niniak Mamak dalam adat.",
-      "Menganalisis filosofi ukiran dan konstruksi Rumah Gadang.",
-      "Studi kasus upacara adat pernikahan Minangkabau.",
+      "Menjelaskan peran penting Bundo Kanduang.",
+      "Menganalisis filosofi ukiran Rumah Gadang.",
     ],
   ),
   Course(
     title: "Gerak Anggun Tari Klasik Keraton Jawa",
     category: "Seni",
-    description: "Pengenalan mendalam pada Tari Serimpi dan Bedhaya, termasuk filosofi di balik gerakan lembut dan busana penari Keraton.",
+    description: "Pengenalan mendalam pada Tari Serimpi dan Bedhaya.",
     videoCount: '12 videos',
     duration: "1h 15m",
     imageUrl: 'assets/tarikawa.jpg',
-    contents: [
-      "Teknik dasar gerakan lambat dan halus Tari Serimpi.",
-      "Memahami filosofi ketenangan dan kesabaran dalam Tari Bedhaya.",
-      "Peran Gamelan dan Sinden sebagai iringan utama.",
-      "Menganalisis makna simbolis busana penari Keraton.",
-    ],
+    status: 'approved',
+    contents: ["Teknik dasar gerakan.", "Filosofi ketenangan."],
   ),
   Course(
     title: "Manik-Manik dan Busana Adat Suku Dayak",
     category: "Kerajinan",
-    description: "Eksplorasi Pakaian Adat Dayak Kalimantan, fokus pada teknik pembuatan manik-manik, ukiran, dan busana King Baba/King Bibinge.",
+    description: "Eksplorasi Pakaian Adat Dayak Kalimantan.",
     videoCount: '8 videos',
     duration: "2h 15m",
     imageUrl: 'assets/dayak.jpg',
-    contents: [
-      "Pengenalan berbagai jenis manik-manik dan bahan dasar.",
-      "Langkah-langkah pembuatan aksesoris manik-manik Dayak.",
-      "Simbolisme warna dan motif fauna/flora pada ukiran Dayak.",
-      "Sejarah dan fungsi busana King Baba dan King Bibinge.",
-    ],
+    status: 'approved',
+    contents: ["Pengenalan manik-manik.", "Simbolisme warna."],
   ),
   Course(
-    title: "Memasak Papeda dan Kuah Kuning Ikan Tongkol",
+    title: "Memasak Papeda dan Kuah Kuning",
     category: "Makanan",
-    description: "Teknik dan resep spesifik untuk hidangan ikonik Papua. Belajar membuat Papeda dari sagu dan mengolahnya bersama Kuah Kuning Ikan Tongkol.",
+    description: "Teknik dan resep spesifik untuk hidangan ikonik Papua.",
     videoCount: '8 videos',
     duration: "2h 15m",
     imageUrl: 'assets/papeda.jpg',
-    contents: [
-      "Cara mengolah sagu menjadi Papeda yang kenyal sempurna.",
-      "Resep bumbu lengkap untuk Kuah Kuning Ikan Tongkol.",
-      "Filosofi Papeda sebagai makanan pokok dan ritual adat.",
-      "Teknik penyajian dan etika makan hidangan Papua.",
-    ],
+    status: 'approved',
+    contents: ["Cara mengolah sagu.", "Resep bumbu kuning."],
   ),
 ];
 
 // ==========================================
-// 2. MODEL KOMPLEKS (UNTUK FORM, DRAFT, & UPLOAD)
+// 2. MODEL KOMPLEKS (UNTUK HALAMAN BARU)
 // ==========================================
 
 enum CourseStatus { draft, pending, published, rejected }
@@ -104,7 +95,7 @@ class CourseData {
   String? category;
   String duration;
   String description;
-  dynamic thumbnail; // Bisa berupa File (saat draft lokal) atau String URL (saat dari Firebase)
+  dynamic thumbnail; 
   List<String> learningOutcomes;
   List<CourseSection> sections;
   CourseStatus status;
@@ -126,6 +117,44 @@ class CourseData {
     this.uploadDate,
     this.isDraft = true,
   });
+
+  // --- FITUR BARU: KONVERTER DARI DATA LAMA KE DATA BARU ---
+  // Ini jembatannya, biar data dummy bisa masuk ke halaman detail baru
+  factory CourseData.fromSimpleCourse(Course simple) {
+    
+    // Konversi string status simple ke Enum CourseStatus
+    CourseStatus convertedStatus = CourseStatus.draft;
+    if (simple.status == 'approved' || simple.status == 'Diterima') {
+      convertedStatus = CourseStatus.published;
+    } else if (simple.status == 'pending') {
+      convertedStatus = CourseStatus.pending;
+    }
+
+    return CourseData(
+      id: DateTime.now().toString(), // ID acak
+      title: simple.title,
+      subtitle: "${simple.videoCount} • ${simple.category}",
+      author: "Admin BudayaPedia", // Default Author
+      category: simple.category,
+      duration: simple.duration,
+      description: simple.description,
+      thumbnail: simple.imageUrl, // String URL asset
+      status: convertedStatus, // Menggunakan status hasil konversi
+      isDraft: false,
+      
+      // [PERBAIKAN] Tambahkan .map((e) => e.toString()) agar dynamic aman dikonversi ke String
+      learningOutcomes: simple.contents.map((e) => e.toString()).toList(),
+      
+      sections: [
+        // Bikin section dummy biar nggak kosong
+        CourseSection(
+          title: "Pendahuluan", 
+          // [PERBAIKAN] Tambahkan .toString() pada title
+          lessons: simple.contents.map((c) => Lesson(title: c.toString(), type: 'text')).toList()
+        )
+      ], 
+    );
+  }
 }
 
 class CourseSection {
@@ -140,8 +169,8 @@ class CourseSection {
 
 class Lesson {
   String title;
-  String type; // 'pdf', 'text', 'quiz', 'interactive'
-  String? contentPath; // URL, Path File, Teks Artikel, atau JSON String (Interactive)
+  String type; 
+  String? contentPath; 
   List<QuizQuestion>? quizQuestions;
 
   Lesson({
@@ -165,10 +194,11 @@ class QuizQuestion {
 }
 
 class CourseDatabase {
-  // Menyimpan draft course yang belum di-submit
   static List<CourseData> draftCourses = [];
   
-  // Menyimpan course yang sudah di-submit (Pending review)
-  // Dalam aplikasi nyata, ini nanti diambil dari Firebase
-  static List<CourseData> uploadedCourses = []; 
+  // --- BAGIAN PENTING: GABUNGKAN DATA ---
+  // List ini sekarang otomatis berisi Data Dummy LAMA yang sudah dikonversi
+  static List<CourseData> uploadedCourses = [
+    ...allCourses.map((c) => CourseData.fromSimpleCourse(c)).toList(),
+  ]; 
 }

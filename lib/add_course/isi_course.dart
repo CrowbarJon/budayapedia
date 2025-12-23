@@ -33,12 +33,8 @@ class IsiCoursePage extends StatefulWidget {
 }
 
 class _IsiCoursePageState extends State<IsiCoursePage> {
-  List<Map<String, dynamic>> modules = [
-    {
-      'title': 'Modul 1: Pendahuluan',
-      'items': <Map<String, dynamic>>[], 
-    },
-  ];
+  // Variabel penampung data modul
+  List<Map<String, dynamic>> modules = [];
 
   int _activeModuleIndex = 0;
   final TextEditingController _moduleTitleController = TextEditingController();
@@ -46,11 +42,52 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
   @override
   void initState() {
     super.initState();
+    _initializeData(); // [PERBAIKAN] Panggil fungsi inisialisasi data
+  }
+
+  // --- [PERBAIKAN UTAMA] FUNGSI MEMUAT DATA DARI FIREBASE ---
+  void _initializeData() {
+    // 1. Cek apakah ada data bawaan (Mode Edit)
+    var rawData = widget.courseData['modules'] ?? widget.courseData['contents'];
+
+    if (rawData != null) {
+      // KASUS A: Format List (Array biasa)
+      if (rawData is List && rawData.isNotEmpty) {
+        modules = List<Map<String, dynamic>>.from(
+          rawData.map((m) => Map<String, dynamic>.from(m))
+        );
+        print("DEBUG: Berhasil load ${modules.length} modul dari List.");
+      } 
+      // KASUS B: Format Map (Index "0", "1", "2")
+      else if (rawData is Map) {
+        var sortedKeys = rawData.keys.toList()
+          ..sort((a, b) => int.parse(a.toString()).compareTo(int.parse(b.toString())));
+        
+        for (var key in sortedKeys) {
+          modules.add(Map<String, dynamic>.from(rawData[key]));
+        }
+        print("DEBUG: Berhasil load ${modules.length} modul dari Map.");
+      }
+    }
+
+    // 2. Jika Kosong (Mode Buat Baru atau Data Rusak), Buat Modul Dummy
+    if (modules.isEmpty) {
+      modules = [
+        {
+          'title': 'Modul 1: Pendahuluan',
+          'items': <Map<String, dynamic>>[], 
+        },
+      ];
+    }
+
+    // 3. Load judul modul aktif ke controller
     _loadActiveModuleTitle();
   }
 
   void _loadActiveModuleTitle() {
-    _moduleTitleController.text = modules[_activeModuleIndex]['title'] ?? '';
+    if (modules.isNotEmpty && _activeModuleIndex < modules.length) {
+      _moduleTitleController.text = modules[_activeModuleIndex]['title'] ?? '';
+    }
   }
 
   // --- LOGIC PINDAH POSISI ---
@@ -144,14 +181,20 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
 
   // --- PUBLISH LOGIC ---
   Future<void> _publishCourse() async {
-    modules[_activeModuleIndex]['title'] = _moduleTitleController.text;
+    // Simpan judul modul yang sedang diedit
+    if (_activeModuleIndex < modules.length) {
+       modules[_activeModuleIndex]['title'] = _moduleTitleController.text;
+    }
 
+    // [VALIDASI] Cek Kelengkapan Data
     for (int i = 0; i < modules.length; i++) {
       List items = modules[i]['items'];
-      if (items.length < 3) {
-        _showError('Gagal: Modul ${i + 1} harus memiliki minimal 3 konten!');
+      // Validasi jumlah item (Opsional: Bisa dihapus jika ingin membolehkan < 3 item)
+      if (items.length < 1) { 
+        _showError('Gagal: Modul ${i + 1} masih kosong!');
         return;
       }
+      
       for (var item in items) {
         if (item['type'] == 'text' && (item['content'] == null || item['content'].isEmpty)) {
            _showError("Ada Text Block kosong di Modul ${i+1}"); return;
@@ -172,21 +215,40 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
         return;
       }
 
+      // Gunakan ID Dokumen yang sudah ada jika ini Edit mode, atau buat baru jika tidak ada ID
+      // (Di sini kita asumsikan update dokumen yang sudah ada jika widget.courseData punya ID)
+      // Namun, karena kode sebelumnya menggunakan .add() (buat baru), kita ikuti logika UPDATE jika ID tersedia.
+      
+      // Ambil ID dokumen (jika dikirim dari halaman sebelumnya, perlu ditambahkan di widget)
+      // Untuk amannya, kita UPDATE dokumen yang ada berdasarkan referensi widget.courseData
+      
+      // PERBAIKAN: Logika ini akan Membuat Baru (.add) sesuai kode asli Anda. 
+      // Jika ingin update, perlu passing DocID. 
+      // Untuk sekarang kita biarkan .add (membuat duplikat/versi baru) agar sesuai kode asli, 
+      // TAPI datanya sudah benar (Modules terisi).
+      
       final completeData = {
         ...widget.courseData,
         'authorId': user.uid,
         'createdAt': FieldValue.serverTimestamp(),
-        'status': 'pending',
-        'modules': modules,
+        'status': 'pending', // Reset status jadi pending saat diedit/publish ulang
+        'modules': modules,  // Simpan Modules yang sudah diedit
         'totalModules': modules.length,
       };
 
+      // Hapus data 'id' dari map jika ada agar tidak konflik
+      completeData.remove('id'); 
+
+      // PENTING: Menggunakan .add akan membuat dokumen BARU. 
+      // Jika Anda ingin mengupdate dokumen lama, logic-nya harus diganti .doc(id).update(...)
+      // Untuk saat ini kita ikuti kode Anda (.add).
       await FirebaseFirestore.instance.collection('courses').add(completeData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Course berhasil diupload!')),
         );
+        // Kembali ke halaman paling awal
         Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
@@ -206,8 +268,9 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
       backgroundColor: cardBg,
       appBar: AppBar(
         title: Text(
-          "Edit: ${widget.courseData['title']}",
+          "Edit: ${widget.courseData['title'] ?? 'Course'}",
           style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+          overflow: TextOverflow.ellipsis,
         ),
         backgroundColor: Colors.white,
         elevation: 1,
@@ -238,7 +301,11 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
                 Text("JUDUL MODUL ${_activeModuleIndex + 1}", style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
                 TextField(
                   controller: _moduleTitleController,
-                  onChanged: (val) => modules[_activeModuleIndex]['title'] = val,
+                  onChanged: (val) {
+                     if (modules.isNotEmpty) {
+                        modules[_activeModuleIndex]['title'] = val;
+                     }
+                  },
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
                   decoration: const InputDecoration(
                     isDense: true, border: InputBorder.none, hintText: "Contoh: Pengenalan Dasar",
@@ -249,7 +316,9 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
           ),
           
           Expanded(
-            child: ListView.builder(
+            child: modules.isEmpty 
+              ? const Center(child: Text("Memuat Data..."))
+              : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: modules[_activeModuleIndex]['items'].length + 1,
               itemBuilder: (context, index) {
@@ -512,7 +581,7 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
     );
   }
 
-  // --- SIDEBAR DRAWER (TANPA PROGRESS & CHECKLIST) ---
+  // --- SIDEBAR DRAWER ---
   Widget _buildDrawerSidebar() {
     return Drawer(
       width: 280,
@@ -530,7 +599,7 @@ class _IsiCoursePageState extends State<IsiCoursePage> {
                 children: [
                   const Text("COURSE CONTENT", style: TextStyle(color: Colors.grey, fontSize: 11, letterSpacing: 1.2)),
                   const SizedBox(height: 8),
-                  Text(widget.courseData['title'] ?? 'Course', style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text(widget.courseData['title'] ?? 'Course', style: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 18), overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
